@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 import model.ClienteModel;
+import util.SessaoUsuario;
 
 /**
  *
@@ -26,6 +27,9 @@ public class ClienteView extends javax.swing.JFrame {
      */
     public ClienteView() {
         initComponents();
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
         tblCliente.addMouseListener(new java.awt.event.MouseAdapter() {
 
             @Override
@@ -419,7 +423,7 @@ public class ClienteView extends javax.swing.JFrame {
     }//GEN-LAST:event_cbxTipoClienteActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        // TODO add your handling code here:
+        Navegador.abrirTela(this, new ListaUsuarioModal(), alterado);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     private void btnNovoClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoClienteActionPerformed

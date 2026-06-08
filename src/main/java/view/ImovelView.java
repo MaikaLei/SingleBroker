@@ -6,6 +6,7 @@ import util.Navegador;
 import java.awt.Color;
 import javax.swing.JOptionPane;
 import model.ImovelModel;
+import util.SessaoUsuario;
 
 /**
  *
@@ -23,6 +24,9 @@ public class ImovelView extends javax.swing.JFrame {
      */
     public ImovelView() {
         initComponents();
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
         bloquearCampos();
     }
 
@@ -521,7 +525,7 @@ public class ImovelView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnContatoProprietarioActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        // TODO add your handling code here:
+        Navegador.abrirTela(this, new ListaUsuarioModal(), alterado);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     /**
@@ -601,8 +605,7 @@ public class ImovelView extends javax.swing.JFrame {
 
         taDescricao.setText(imovel.getApresentacao());
     }
-    
-    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnContatoProprietario;

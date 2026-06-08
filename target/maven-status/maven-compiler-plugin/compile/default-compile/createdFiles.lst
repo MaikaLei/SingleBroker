@@ -94,6 +94,7 @@ view\LoginView$1.class
 view\ListaImovelView$1.class
 view\NovoImovelView$13.class
 view\AgendaView$26.class
+view\ListaUsuarioModal.class
 view\FotosModal$2.class
 view\SelecionarClienteView$7.class
 view\RelatoriosView$1.class
@@ -181,6 +182,7 @@ view\AgendaView$5.class
 view\NovoImovelView$27.class
 view\AgendaView$2.class
 view\cadastroUsuarioModalView$2.class
+view\ListaUsuarioModal$1.class
 view\NovoImovelView$24.class
 view\ImovelView$6.class
 view\MinhaPaginaView.class
@@ -204,6 +206,7 @@ view\ListaImovelView$9.class
 view\AgendaView$44.class
 view\NovoImovelView$5.class
 view\AgendaView$37.class
+view\ListaUsuarioModal$2.class
 model\DocumentoModel.class
 view\ClienteView$8.class
 view\CriativosView$4.class
@@ -218,6 +221,7 @@ view\RelatoriosView$7.class
 model\MinhaPaginaModel.class
 view\ClienteView$9.class
 view\AgendaView$4.class
+view\ListaUsuarioModal$3.class
 view\SelecionarClienteView$1.class
 view\AgendaModal$2.class
 view\AgendaView$38.class

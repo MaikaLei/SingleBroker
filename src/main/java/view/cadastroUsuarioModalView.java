@@ -49,7 +49,7 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
         btnSalvar = new javax.swing.JButton();
         cbxTipoUsuario = new javax.swing.JComboBox<>();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -81,8 +81,6 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
         txtNome.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtNome.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         jPanel3.add(txtNome, new org.netbeans.lib.awtextra.AbsoluteConstraints(114, 46, 323, -1));
-
-        txtSenha.setText("jPasswordField1");
         jPanel3.add(txtSenha, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 110, 320, -1));
 
         jLabel24.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -106,7 +104,7 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
                 btnCancelarActionPerformed(evt);
             }
         });
-        jPanel3.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 210, -1, -1));
+        jPanel3.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 210, -1, -1));
 
         btnSalvar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/add.png"))); // NOI18N

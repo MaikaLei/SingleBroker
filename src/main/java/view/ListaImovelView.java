@@ -29,11 +29,9 @@ public class ListaImovelView extends javax.swing.JFrame {
     public ListaImovelView() {
         initComponents();
 
-        if (SessaoUsuario.getUsuarioLogado().getPerfil()
-                != PerfilUsuario.ADMINISTRADOR) {
-
-            lblUsuarios.setVisible(false);
-        }
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
 
         configurarTabela();
         carregarTabela();
@@ -172,6 +170,9 @@ public class ListaImovelView extends javax.swing.JFrame {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblUsuariosMouseClicked(evt);
             }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblUsuariosMouseEntered(evt);
+            }
         });
 
         javax.swing.GroupLayout panelMenuLayout = new javax.swing.GroupLayout(panelMenu);
@@ -210,7 +211,7 @@ public class ListaImovelView extends javax.swing.JFrame {
                 .addComponent(lblRelatorios)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblUsuarios)
-                .addContainerGap(287, Short.MAX_VALUE))
+                .addContainerGap(246, Short.MAX_VALUE))
         );
 
         getContentPane().add(panelMenu, java.awt.BorderLayout.LINE_START);
@@ -355,7 +356,7 @@ public class ListaImovelView extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(22, 22, 22)
+                .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(btnNovoImovel, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -365,7 +366,7 @@ public class ListaImovelView extends javax.swing.JFrame {
                         .addComponent(txtCodigoBusca, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelLista, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(171, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -375,9 +376,9 @@ public class ListaImovelView extends javax.swing.JFrame {
                     .addComponent(btnNovoImovel)
                     .addComponent(txtCodigoBusca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
-                .addGap(31, 31, 31)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(panelLista, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18))
         );
@@ -432,7 +433,7 @@ public class ListaImovelView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnNovoImovelActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        Navegador.abrirTela(this, new cadastroUsuarioModalView(), alterado);
+        new ListaUsuarioModal().setVisible(true);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     private void btnFiltrarImovelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiltrarImovelActionPerformed
@@ -450,6 +451,10 @@ public class ListaImovelView extends javax.swing.JFrame {
     private void tblListaImoveisMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblListaImoveisMouseClicked
 
     }//GEN-LAST:event_tblListaImoveisMouseClicked
+
+    private void lblUsuariosMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseEntered
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblUsuariosMouseEntered
 
     /**
      * @param args the command line arguments

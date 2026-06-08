@@ -6,6 +6,7 @@ package view;
 
 import java.awt.Color;
 import util.Navegador;
+import util.SessaoUsuario;
 
 /**
  *
@@ -22,6 +23,9 @@ public class RelatoriosView extends javax.swing.JFrame {
      */
     public RelatoriosView() {
         initComponents();
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
     }
 
     /**
@@ -571,7 +575,7 @@ public class RelatoriosView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLimparActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        // TODO add your handling code here:
+        Navegador.abrirTela(this, new ListaUsuarioModal(), alterado);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     /**

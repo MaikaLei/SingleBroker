@@ -7,6 +7,7 @@ package view;
 import util.Navegador;
 
 import java.awt.Color;
+import util.SessaoUsuario;
 
 /**
  *
@@ -23,6 +24,9 @@ public class AgendaView extends javax.swing.JFrame {
      */
     public AgendaView() {
         initComponents();
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
     }
 
     /**
@@ -949,7 +953,7 @@ public class AgendaView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnGrid42ActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        // TODO add your handling code here:
+        Navegador.abrirTela(this, new ListaUsuarioModal(), alterado);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     /**

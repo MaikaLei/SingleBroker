@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import model.ClienteModel;
 import model.ClientePfModel;
 import model.ClientePjModel;
+import util.SessaoUsuario;
 
 /**
  *
@@ -27,6 +28,9 @@ public class NovoImovelView extends javax.swing.JFrame {
      */
     public NovoImovelView() {
         initComponents();
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
     }
 
     /**
@@ -1145,7 +1149,7 @@ public class NovoImovelView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelarImovelActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        // TODO add your handling code here:
+        Navegador.abrirTela(this, new ListaUsuarioModal(), alterado);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     /**
