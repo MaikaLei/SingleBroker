@@ -19,6 +19,7 @@ view\CriativosView$9.class
 view\MinhaPaginaView$7.class
 view\SelecionarClienteView.class
 view\CriativosView$3.class
+view\ListaUsuarioModal$1$1.class
 view\AgendaView$9.class
 view\ListaImovelView$11.class
 view\AgendaView$17.class
@@ -67,6 +68,7 @@ view\AgendaView$32.class
 view\MinhaPaginaView$8.class
 view\ListaImovelView$12.class
 view\ClienteView$3.class
+view\ListaUsuarioModal$7.class
 view\SelecionarClienteView$5.class
 controller\RelatorioController.class
 util\SessaoUsuario.class
@@ -141,6 +143,7 @@ view\AgendaView$40.class
 view\ListaImovelView$5.class
 view\CriativosView.class
 view\ImovelView$10.class
+view\ListaUsuarioModal$5.class
 view\NovoClienteModal$3.class
 view\SelecionarClienteView$3.class
 model\ClientePfModel.class
@@ -154,6 +157,7 @@ view\CriativosView$1.class
 view\AgendaHoraModal.class
 view\NovoClienteModal$2.class
 model\ClienteModel.class
+view\ListaUsuarioModal$6.class
 view\SelecionarClienteView$4.class
 view\AgendaView$1.class
 view\AgendaView$18.class
@@ -177,6 +181,7 @@ view\AgendaView$22.class
 view\AgendaHoraModal$2.class
 view\AgendaView$42.class
 view\NovoClienteModal$1.class
+view\ListaUsuarioModal$4.class
 view\SelecionarClienteView$10.class
 view\AgendaView$5.class
 view\NovoImovelView$27.class

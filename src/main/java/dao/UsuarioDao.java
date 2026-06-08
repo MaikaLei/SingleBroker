@@ -5,6 +5,7 @@ import jakarta.persistence.TypedQuery;
 import java.util.List;
 import model.UsuarioModel;
 import util.JPAUtil;
+import enums.PerfilUsuario;
 
 /**
  *
@@ -183,6 +184,59 @@ public class UsuarioDao {
 
         }
 
+    }
+
+    public List<UsuarioModel> buscar(
+            String perfil,
+            String status
+    ) {
+
+        EntityManager em = JPAUtil.getEntityManager();
+
+        try {
+
+            String jpql
+                    = "SELECT u FROM UsuarioModel u WHERE 1=1";
+
+            if (!perfil.equals("TODOS")) {
+
+                jpql += " AND u.perfil = :perfil";
+            }
+
+            if (!status.equals("TODOS")) {
+
+                jpql += " AND u.ativo = :ativo";
+            }
+
+            TypedQuery<UsuarioModel> query
+                    = em.createQuery(
+                            jpql,
+                            UsuarioModel.class
+                    );
+
+            if (!perfil.equals("TODOS")) {
+
+                query.setParameter(
+                        "perfil",
+                        PerfilUsuario.valueOf(perfil)
+                );
+            }
+
+            if (!status.equals("TODOS")) {
+
+                query.setParameter(
+                        "ativo",
+                        status.equals("ATIVO")
+                );
+            }
+
+            return query.getResultList();
+
+        } finally {
+
+            em.close();
+
+        }
     }
 
 }

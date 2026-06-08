@@ -14,6 +14,7 @@ import util.Navegador;
 public class cadastroUsuarioModalView extends javax.swing.JFrame {
 
     private boolean alterado = false;
+    private UsuarioModel usuarioEdicao;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(cadastroUsuarioModalView.class.getName());
 
@@ -133,15 +134,30 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         try {
 
-            UsuarioModel usuario = new UsuarioModel();
+            UsuarioDao dao = new UsuarioDao();
+
+            UsuarioModel usuario;
+
+            if (usuarioEdicao != null) {
+
+                usuario = usuarioEdicao;
+
+            } else {
+
+                usuario = new UsuarioModel();
+                usuario.setDataCadastro(LocalDateTime.now());
+
+            }
 
             usuario.setNome(txtNome.getText().trim());
 
             usuario.setEmail(txtEmail.getText().trim());
 
-            usuario.setSenha(
-                    new String(txtSenha.getPassword())
-            );
+            String senha = new String(txtSenha.getPassword());
+
+            if (!senha.isBlank()) {
+                usuario.setSenha(senha);
+            }
 
             usuario.setPerfil(
                     PerfilUsuario.valueOf(
@@ -150,19 +166,29 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
             );
 
             usuario.setAtivo(
-                    cbxStatus.getSelectedItem().toString().equals("ATIVO")
+                    cbxStatus.getSelectedItem()
+                            .toString()
+                            .equals("ATIVO")
             );
 
-            usuario.setDataCadastro(LocalDateTime.now());
+            if (usuarioEdicao != null) {
 
-            UsuarioDao dao = new UsuarioDao();
+                dao.atualizar(usuario);
 
-            dao.salvar(usuario);
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Usuário atualizado com sucesso!"
+                );
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Usuário cadastrado com sucesso!"
-            );
+            } else {
+
+                dao.salvar(usuario);
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Usuário cadastrado com sucesso!"
+                );
+            }
 
             dispose();
 
@@ -170,11 +196,9 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Erro ao cadastrar usuário:\n" + e.getMessage()
+                    "Erro ao salvar usuário:\n" + e.getMessage()
             );
-
         }
-
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     /**
@@ -200,6 +224,25 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new cadastroUsuarioModalView().setVisible(true));
+    }
+
+    public cadastroUsuarioModalView(UsuarioModel usuario) {
+
+        initComponents();
+
+        this.usuarioEdicao = usuario;
+
+        txtNome.setText(usuario.getNome());
+        txtEmail.setText(usuario.getEmail());
+        txtSenha.setText(usuario.getSenha());
+
+        cbxTipoUsuario.setSelectedItem(
+                usuario.getPerfil().name()
+        );
+
+        cbxStatus.setSelectedItem(
+                usuario.getAtivo() ? "ATIVO" : "INATIVO"
+        );
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

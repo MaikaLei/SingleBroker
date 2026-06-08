@@ -3,6 +3,8 @@ package view;
 import dao.UsuarioDao;
 import enums.PerfilUsuario;
 import java.time.LocalDateTime;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 import model.UsuarioModel;
 import util.Navegador;
@@ -15,6 +17,7 @@ import util.SessaoUsuario;
 public class ListaUsuarioModal extends javax.swing.JFrame {
 
     private boolean alterado = false;
+    private List<UsuarioModel> listaUsuarios;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ListaUsuarioModal.class.getName());
 
@@ -32,6 +35,60 @@ public class ListaUsuarioModal extends javax.swing.JFrame {
             dispose();
             return;
         }
+
+        tblListarUsuario.addMouseListener(new java.awt.event.MouseAdapter() {
+
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+
+                if (evt.getClickCount() == 2) {
+
+                    int linha = tblListarUsuario.getSelectedRow();
+
+                    if (linha < 0) {
+                        return;
+                    }
+
+                    Long id = Long.valueOf(
+                            tblListarUsuario.getValueAt(linha, 0).toString()
+                    );
+
+                    UsuarioDao dao = new UsuarioDao();
+
+                    UsuarioModel usuario = dao.buscarPorId(id);
+
+                    System.out.println(usuario.getNome());
+
+                    cadastroUsuarioModalView modal
+                            = new cadastroUsuarioModalView(usuario);
+
+                    modal.addWindowListener(
+                            new java.awt.event.WindowAdapter() {
+
+                        @Override
+                        public void windowClosed(
+                                java.awt.event.WindowEvent e) {
+
+                            carregarTabela();
+                        }
+                    });
+                    modal.setVisible(true);
+                }
+            }
+        });
+
+        carregarTabela();
+        tblListarUsuario.getColumnModel()
+                .getColumn(0)
+                .setMinWidth(0);
+
+        tblListarUsuario.getColumnModel()
+                .getColumn(0)
+                .setMaxWidth(0);
+
+        tblListarUsuario.getColumnModel()
+                .getColumn(0)
+                .setWidth(0);
     }
 
     /**
@@ -53,17 +110,18 @@ public class ListaUsuarioModal extends javax.swing.JFrame {
         cbxTipoUsuario = new javax.swing.JComboBox<>();
         cbxStatus = new javax.swing.JComboBox<>();
         btnLimpar = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setText("LISTA DE USUÁRIOS");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(59, 30, -1, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, -1, -1));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel2.setText("Tipo de Usuário:");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 70, -1, -1));
+        jLabel2.setText("Status");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 60, -1, -1));
 
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -91,28 +149,43 @@ public class ListaUsuarioModal extends javax.swing.JFrame {
 
         tblListarUsuario.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "Tipo", "Nome", "Email"
+                "ID", "Tipo", "Nome", "Email"
             }
         ));
+        tblListarUsuario.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblListarUsuarioMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblListarUsuario);
 
-        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, 170));
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, 170));
 
-        getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, 470, 240));
+        getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 470, 230));
 
         cbxTipoUsuario.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        cbxTipoUsuario.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ADMINISTRADOR", "CORRETOR", "ASSISTENTE" }));
-        getContentPane().add(cbxTipoUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 70, -1, -1));
+        cbxTipoUsuario.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "TODOS", "ADMINISTRADOR", "CORRETOR", "ASSISTENTE" }));
+        cbxTipoUsuario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxTipoUsuarioActionPerformed(evt);
+            }
+        });
+        getContentPane().add(cbxTipoUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 80, -1, -1));
 
         cbxStatus.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        cbxStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ATIVO", "INATIVO" }));
-        getContentPane().add(cbxStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 70, -1, -1));
+        cbxStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "TODOS", "ATIVO", "INATIVO" }));
+        cbxStatus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxStatusActionPerformed(evt);
+            }
+        });
+        getContentPane().add(cbxStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 80, -1, -1));
 
         btnLimpar.setBackground(new java.awt.Color(0, 0, 0));
         btnLimpar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -125,11 +198,18 @@ public class ListaUsuarioModal extends javax.swing.JFrame {
         });
         getContentPane().add(btnLimpar, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 70, -1, -1));
 
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel3.setText("Tipo de Usuário:");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 60, -1, -1));
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
+        cbxTipoUsuario.setSelectedItem("TODOS");
+        cbxStatus.setSelectedItem("TODOS");
 
+        carregarTabela();
     }//GEN-LAST:event_btnLimparActionPerformed
 
     private void btnNovoUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoUsuarioActionPerformed
@@ -139,6 +219,18 @@ public class ListaUsuarioModal extends javax.swing.JFrame {
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
         dispose();
     }//GEN-LAST:event_btnVoltarActionPerformed
+
+    private void tblListarUsuarioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblListarUsuarioMouseClicked
+
+    }//GEN-LAST:event_tblListarUsuarioMouseClicked
+
+    private void cbxTipoUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxTipoUsuarioActionPerformed
+        buscarUsuarios();
+    }//GEN-LAST:event_cbxTipoUsuarioActionPerformed
+
+    private void cbxStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxStatusActionPerformed
+        buscarUsuarios();
+    }//GEN-LAST:event_cbxStatusActionPerformed
 
     /**
      * @param args the command line arguments
@@ -165,6 +257,58 @@ public class ListaUsuarioModal extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> new ListaUsuarioModal().setVisible(true));
     }
 
+    private void carregarTabela() {
+
+        UsuarioDao dao = new UsuarioDao();
+
+        DefaultTableModel modelo
+                = (DefaultTableModel) tblListarUsuario.getModel();
+
+        modelo.setRowCount(0);
+
+        List<UsuarioModel> lista = dao.listar();
+
+        for (UsuarioModel usuario : lista) {
+
+            modelo.addRow(new Object[]{
+                usuario.getId(),
+                usuario.getPerfil(),
+                usuario.getNome(),
+                usuario.getEmail()
+            });
+
+        }
+    }
+
+    private void buscarUsuarios() {
+
+        UsuarioDao dao = new UsuarioDao();
+
+        DefaultTableModel modelo
+                = (DefaultTableModel) tblListarUsuario.getModel();
+
+        modelo.setRowCount(0);
+
+        String perfil
+                = cbxTipoUsuario.getSelectedItem().toString();
+
+        String status
+                = cbxStatus.getSelectedItem().toString();
+
+        List<UsuarioModel> lista
+                = dao.buscar(perfil, status);
+
+        for (UsuarioModel usuario : lista) {
+
+            modelo.addRow(new Object[]{
+                usuario.getId(),
+                usuario.getPerfil(),
+                usuario.getNome(),
+                usuario.getEmail()
+            });
+        }
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLimpar;
     private javax.swing.JButton btnNovoUsuario;
@@ -173,6 +317,7 @@ public class ListaUsuarioModal extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cbxTipoUsuario;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblListarUsuario;
