@@ -67,6 +67,11 @@ public class LoginView extends javax.swing.JFrame {
         });
 
         lblNovaSenha.setText("Esqueceu sua senha?");
+        lblNovaSenha.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblNovaSenhaMouseClicked(evt);
+            }
+        });
 
         lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo120x120.png"))); // NOI18N
 
@@ -173,6 +178,19 @@ public class LoginView extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_btnEntrarActionPerformed
+
+    private void lblNovaSenhaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblNovaSenhaMouseClicked
+        JOptionPane.showMessageDialog(
+                this,
+                """
+    Para redefinição de senha,
+    entre em contato com o administrador.
+
+    Email: admin@imobiliaria.com
+    Telefone: (51) 99999-9999
+    """
+        );
+    }//GEN-LAST:event_lblNovaSenhaMouseClicked
 
     /**
      * @param args the command line arguments

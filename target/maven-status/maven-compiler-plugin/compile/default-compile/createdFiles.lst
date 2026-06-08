@@ -127,6 +127,7 @@ view\MinhaPaginaView$4.class
 view\AgendaView$21.class
 view\AgendaView$41.class
 view\SelecionarClienteView$9.class
+view\LoginView$2.class
 view\ClienteView$7.class
 view\NovoClienteModal.class
 view\CriativosView$6.class
