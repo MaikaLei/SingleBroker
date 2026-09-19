@@ -164,4 +164,47 @@ class FluxosMySqlTest {
             } catch(Exception e){throw new RuntimeException(e);} finally {telas.forEach(JFrame::dispose);}
         });
     }
+
+    private JOptionPane mensagemEm(java.awt.Component componente) {
+        if (componente instanceof JOptionPane mensagem) return mensagem;
+        if (componente instanceof java.awt.Container container) {
+            for (java.awt.Component filho : container.getComponents()) {
+                JOptionPane mensagem=mensagemEm(filho);
+                if (mensagem!=null) return mensagem;
+            }
+        }
+        return null;
+    }
+    @Test @Order(12) void botaoSalvarClienteConfirmaGravacaoERejeitaCpfInvalidoSemFechar() throws Exception {
+        SwingUtilities.invokeAndWait(()->{
+            view.NovoClienteModal tela=new view.NovoClienteModal();
+            java.util.List<String> mensagens=new ArrayList<>();
+            javax.swing.Timer fecharMensagem=new javax.swing.Timer(100,e->{
+                for (java.awt.Window janela:tela.getOwnedWindows()) {
+                    if (janela instanceof JDialog && janela.isVisible()) {
+                        JOptionPane mensagem=mensagemEm(janela);
+                        if(mensagem!=null) { mensagens.add(String.valueOf(mensagem.getMessage())); janela.dispose(); }
+                    }
+                }
+            });
+            fecharMensagem.start();
+            try {
+                ((JComboBox<?>)campo(tela,"cbxTipoCliente")).setSelectedIndex(1);
+                ((JTextField)campo(tela,"txtNome")).setText("Cliente novo pelo botão");
+                ((JTextField)campo(tela,"txtCpf")).setText("11111111111");
+                ((JButton)campo(tela,"btnSalvar")).doClick();
+                assertTrue(mensagens.get(0).contains("CPF inválido"));
+                assertTrue(tela.isDisplayable(),"O formulário deve permanecer aberto quando o CPF é inválido");
+                ((JTextField)campo(tela,"txtCpf")).setText("111.444.777-35");
+                ((JTextField)campo(tela,"txtNascimento")).setText("15/02/1960");
+                ((JButton)campo(tela,"btnSalvar")).doClick();
+                assertTrue(mensagens.get(1).startsWith("Cliente salvo com sucesso! Código: "));
+                assertFalse(tela.isDisplayable());
+            } catch(Exception e){throw new RuntimeException(e);} finally {fecharMensagem.stop();tela.dispose();}
+        });
+        try(Connection c=DriverManager.getConnection(servidor+schema,usuario,senha);PreparedStatement q=c.prepareStatement("SELECT pf.nome, pf.cpf FROM cliente_pf pf JOIN cliente c ON c.id=pf.id WHERE pf.cpf=?")) {
+            q.setString(1,"11144477735");
+            try(ResultSet r=q.executeQuery()) { assertTrue(r.next()); assertEquals("Cliente novo pelo botão",r.getString(1)); assertFalse(r.next()); }
+        }
+    }
 }

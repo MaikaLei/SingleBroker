@@ -394,6 +394,7 @@ public class NovoClienteModal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
+        logger.info("Cliente: solicitação de salvamento recebida.");
         try {
             if (cbxTipoCliente.getSelectedIndex() == 0) throw new IllegalArgumentException("Selecione o tipo de cliente.");
             ClienteModel cliente = clienteEdicao == null
@@ -420,10 +421,15 @@ public class NovoClienteModal extends javax.swing.JFrame {
             cliente.setCidade(txtCidade.getText());
             cliente.setEstado(cbxEstado.getSelectedItem().toString());
             new controller.ClienteController().salvar(cliente);
-            javax.swing.JOptionPane.showMessageDialog(this, "Cliente salvo com sucesso!");
+            logger.log(java.util.logging.Level.INFO, "Cliente: salvamento confirmado, código {0}.", cliente.getId());
+            javax.swing.JOptionPane.showMessageDialog(this, "Cliente salvo com sucesso! Código: " + cliente.getId());
             dispose();
+        } catch (IllegalArgumentException e) {
+            logger.log(java.util.logging.Level.INFO, "Cliente: validação impediu o salvamento: {0}", e.getMessage());
+            javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Confira os dados", javax.swing.JOptionPane.WARNING_MESSAGE);
         } catch (RuntimeException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Não foi possível salvar", javax.swing.JOptionPane.ERROR_MESSAGE);
+            logger.log(java.util.logging.Level.SEVERE, "Cliente: falha no salvamento; formulário mantido aberto.", e);
+            javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível salvar o cliente. Os dados continuam nesta tela.\n" + e.getMessage(), "Não foi possível salvar", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSalvarActionPerformed
 

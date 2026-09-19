@@ -8,6 +8,7 @@ import model.ClientePfModel;
 import model.ClientePjModel;
 
 public class ClienteDao {
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(ClienteDao.class.getName());
 
     public void salvar(ClienteModel cliente) {
 
@@ -20,6 +21,7 @@ public class ClienteDao {
             em.persist(cliente);
 
             em.getTransaction().commit();
+            LOGGER.log(java.util.logging.Level.INFO, "Cliente: transação confirmada no MySQL, código {0}.", cliente.getId());
 
         } catch (Exception e) {
 
@@ -197,6 +199,7 @@ public class ClienteDao {
             em.merge(cliente);
 
             em.getTransaction().commit();
+            LOGGER.log(java.util.logging.Level.INFO, "Cliente: transação confirmada no MySQL, código {0}.", cliente.getId());
 
         } catch (Exception e) {
 
