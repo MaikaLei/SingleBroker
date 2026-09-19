@@ -33,6 +33,10 @@ public class ListaImovelView extends javax.swing.JFrame {
                 SessaoUsuario.isAdministrador()
         );
 
+        tblListaImoveis.setDefaultEditor(Object.class, null);
+        cbxStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Status", "Ativo", "Inativo", "Vendido", "Alugado", "Todos"}));
+        cbxCidade.removeAllItems(); cbxCidade.addItem("Cidade");
+        new dao.ImovelDao().listar().stream().map(model.ImovelModel::getCidade).filter(java.util.Objects::nonNull).distinct().sorted().forEach(cbxCidade::addItem);
         configurarTabela();
         carregarTabela();
     }
@@ -437,11 +441,11 @@ public class ListaImovelView extends javax.swing.JFrame {
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     private void btnFiltrarImovelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiltrarImovelActionPerformed
-        buscarImoveis();
+        try { buscarImoveis(); } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível buscar. Confira o código e a conexão com o banco."); }
     }//GEN-LAST:event_btnFiltrarImovelActionPerformed
 
     private void txtCodigoBuscaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodigoBuscaActionPerformed
-        buscarImoveis();
+        try { buscarImoveis(); } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível buscar. Confira o código e a conexão com o banco."); }
     }//GEN-LAST:event_txtCodigoBuscaActionPerformed
 
     private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed

@@ -26,6 +26,7 @@ public class ListaUsuarioModal extends javax.swing.JFrame {
      */
     public ListaUsuarioModal() {
         initComponents();
+        tblListarUsuario.setDefaultEditor(Object.class, null);
         if (!SessaoUsuario.isAdministrador()) {
             JOptionPane.showMessageDialog(
                     this,
@@ -213,7 +214,11 @@ public class ListaUsuarioModal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLimparActionPerformed
 
     private void btnNovoUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoUsuarioActionPerformed
-        new cadastroUsuarioModalView().setVisible(true);
+        cadastroUsuarioModalView janela = new cadastroUsuarioModalView();
+        janela.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent e) { buscarUsuarios(); }
+        });
+        janela.setVisible(true);
     }//GEN-LAST:event_btnNovoUsuarioActionPerformed
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed

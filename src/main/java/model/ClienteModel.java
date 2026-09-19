@@ -35,6 +35,16 @@ public class ClienteModel implements Serializable {
     public ClienteModel() {
     }
 
+
+    private java.time.LocalDate dataCadastro;
+    @jakarta.persistence.ManyToOne
+    @jakarta.persistence.JoinColumn(name="usuario_cadastro_id")
+    private UsuarioModel usuarioCadastro;
+    public java.time.LocalDate getDataCadastro() { return dataCadastro; }
+    public void setDataCadastro(java.time.LocalDate v) { dataCadastro=v; }
+    public UsuarioModel getUsuarioCadastro() { return usuarioCadastro; }
+    public void setUsuarioCadastro(UsuarioModel v) { usuarioCadastro=v; }
+
     public Long getId() {
         return id;
     }

@@ -27,9 +27,9 @@ public class UsuarioDao {
 
         } catch (Exception e) {
 
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
 
-            e.printStackTrace();
+            throw new IllegalStateException("Não foi possível salvar a alteração no banco de dados.", e);
 
         } finally {
 
@@ -104,9 +104,9 @@ public class UsuarioDao {
 
         } catch (Exception e) {
 
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
 
-            e.printStackTrace();
+            throw new IllegalStateException("Não foi possível salvar a alteração no banco de dados.", e);
 
         } finally {
 
@@ -130,9 +130,9 @@ public class UsuarioDao {
 
         } catch (Exception e) {
 
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
 
-            e.printStackTrace();
+            throw new IllegalStateException("Não foi possível salvar a alteração no banco de dados.", e);
 
         } finally {
 
@@ -143,47 +143,22 @@ public class UsuarioDao {
     }
 
     public UsuarioModel autenticar(String email, String senha) {
-
         EntityManager em = JPAUtil.getEntityManager();
-
         try {
-
-            TypedQuery<UsuarioModel> query = em.createQuery(
-                    "SELECT u FROM UsuarioModel u "
-                    + "WHERE u.email = :email "
-                    + "AND u.senha = :senha "
-                    + "AND u.ativo = true",
-                    UsuarioModel.class);
-
-            query.setParameter("email", email);
-            query.setParameter("senha", senha);
-
-            UsuarioModel usuario = query.getSingleResult();
-
+            List<UsuarioModel> encontrados = em.createQuery(
+                    "SELECT u FROM UsuarioModel u WHERE LOWER(u.email) = LOWER(:email) AND u.ativo = true", UsuarioModel.class)
+                    .setParameter("email", email.trim()).getResultList();
+            if (encontrados.size() != 1 || !util.Senhas.verificar(senha, encontrados.get(0).getSenha())) return null;
+            UsuarioModel usuario = encontrados.get(0);
             em.getTransaction().begin();
-
+            if (!util.Senhas.isHash(usuario.getSenha())) usuario.setSenha(util.Senhas.gerarLegada(senha));
             usuario.setUltimoLogin(java.time.LocalDateTime.now());
-
-            em.merge(usuario);
-
             em.getTransaction().commit();
-
             return usuario;
-
-        } catch (Exception e) {
-
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-
-            return null;
-
-        } finally {
-
-            em.close();
-
-        }
-
+        } catch (RuntimeException e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
+            throw new IllegalStateException("Não foi possível acessar o banco. Verifique a conexão com o MySQL.", e);
+        } finally { em.close(); }
     }
 
     public List<UsuarioModel> buscar(

@@ -140,7 +140,7 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
 
             if (usuarioEdicao != null) {
 
-                usuario = usuarioEdicao;
+                usuario = new UsuarioDao().buscarPorId(usuarioEdicao.getId());
 
             } else {
 
@@ -155,9 +155,7 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
 
             String senha = new String(txtSenha.getPassword());
 
-            if (!senha.isBlank()) {
-                usuario.setSenha(senha);
-            }
+
 
             usuario.setPerfil(
                     PerfilUsuario.valueOf(
@@ -173,7 +171,7 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
 
             if (usuarioEdicao != null) {
 
-                dao.atualizar(usuario);
+                new controller.UsuarioController().salvar(usuario, senha);
 
                 JOptionPane.showMessageDialog(
                         this,
@@ -182,7 +180,7 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
 
             } else {
 
-                dao.salvar(usuario);
+                new controller.UsuarioController().salvar(usuario, senha);
 
                 JOptionPane.showMessageDialog(
                         this,
@@ -234,7 +232,8 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
 
         txtNome.setText(usuario.getNome());
         txtEmail.setText(usuario.getEmail());
-        txtSenha.setText(usuario.getSenha());
+        txtSenha.setText("");
+        txtSenha.setToolTipText("Deixe em branco para manter a senha atual.");
 
         cbxTipoUsuario.setSelectedItem(
                 usuario.getPerfil().name()

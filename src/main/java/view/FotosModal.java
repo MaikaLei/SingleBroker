@@ -13,6 +13,7 @@ import util.Navegador;
 public class FotosModal extends javax.swing.JFrame {
 
     private boolean alterado = false;
+    private AnexosPanel anexos;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FotosModal.class.getName());
 
@@ -21,6 +22,7 @@ public class FotosModal extends javax.swing.JFrame {
      */
     public FotosModal() {
         initComponents();
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     }
 
     /**
@@ -149,11 +151,14 @@ public class FotosModal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        Navegador.abrirTela(this, new NovoImovelView(), alterado);        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnSalvarImovelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarImovelActionPerformed
-        Navegador.abrirTela(this, new NovoImovelView(), alterado);        // TODO add your handling code here:
+        try {
+            if (anexos == null) throw new IllegalStateException("Abra os anexos pelo cadastro do imóvel.");
+            anexos.salvar(); dispose();
+        } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível salvar os anexos: " + e.getMessage()); }
     }//GEN-LAST:event_btnSalvarImovelActionPerformed
 
     /**
@@ -179,6 +184,17 @@ public class FotosModal extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new FotosModal().setVisible(true));
+    }
+
+    public FotosModal(Long imovelId) {
+        this();
+        anexos = new AnexosPanel(imovelId, true);
+        pnlSemFotos.removeAll();
+        pnlSemFotos.setLayout(new java.awt.BorderLayout());
+        pnlSemFotos.add(anexos, java.awt.BorderLayout.CENTER);
+        pnlSemFotos.revalidate();
+        pack();
+        jLabel2.setText("Use Adicionar para selecionar arquivos (até 5 MB cada).");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

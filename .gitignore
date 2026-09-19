@@ -1,0 +1,7 @@
+/target/
+/SingleBroker-*.jar
+/SingleBroker-backup-*.zip
+/SingleBroker-database-backup-*.sql
+/singlebroker.local.properties
+/data/
+/.work/

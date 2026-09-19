@@ -506,7 +506,7 @@ public class ImovelView extends javax.swing.JFrame {
     private void btnEditarImovelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarImovelActionPerformed
         Navegador.abrirTela(
                 this,
-                new NovoImovelView(),
+                new NovoImovelView(imovelAtual),
                 alterado
         );
     }//GEN-LAST:event_btnEditarImovelActionPerformed
@@ -604,6 +604,14 @@ public class ImovelView extends javax.swing.JFrame {
         );
 
         taDescricao.setText(imovel.getApresentacao());
+        lblCodigo.setText(String.valueOf(imovel.getId()));
+        lblTitulo.setText(imovel.getTipoImovel() + " - " + imovel.getCidade());
+        java.util.List<model.FotoModel> fotos = new dao.FotoDao().listar(imovel.getId());
+        if (!fotos.isEmpty()) lblFotoPrincipal.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(fotos.get(0).getConteudo()).getImage().getScaledInstance(330,220,java.awt.Image.SCALE_SMOOTH)));
+        lblFotoPrincipal.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        lblFotoPrincipal.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent e) { new FotosModal(imovel.getId()).setVisible(true); }
+        });
     }
 
 

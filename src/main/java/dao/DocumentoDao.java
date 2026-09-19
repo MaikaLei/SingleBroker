@@ -1,13 +1,2 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dao;
-
-/**
- *
- * @author maiko
- */
-public class DocumentoDao {
-    
-}
+public class DocumentoDao extends AnexoDao<model.DocumentoModel> { public DocumentoDao() { super(model.DocumentoModel.class); } }

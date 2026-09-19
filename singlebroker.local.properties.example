@@ -1,0 +1,5 @@
+# Copie para singlebroker.local.properties (ignorado pelo Git).
+db.url=jdbc:mysql://localhost:3306/singlebrokerdb
+db.user=root
+db.password=INFORME_A_SENHA_LOCAL
+db.ddl=update

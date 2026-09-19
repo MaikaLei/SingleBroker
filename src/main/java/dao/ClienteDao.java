@@ -23,11 +23,9 @@ public class ClienteDao {
 
         } catch (Exception e) {
 
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
 
-            e.printStackTrace();
+            throw new IllegalStateException("Não foi possível salvar a alteração no banco de dados.", e);
 
         } finally {
 
@@ -127,12 +125,12 @@ public class ClienteDao {
                     """
                 FROM ClientePfModel c
                 WHERE UPPER(c.nome) LIKE UPPER(:nome)
-                AND c.cpf LIKE :cpf
-                AND c.telefone LIKE :telefone
+                AND REPLACE(REPLACE(COALESCE(c.cpf, ''), '.', ''), '-', '') LIKE :cpf
+                AND COALESCE(c.telefone, '') LIKE :telefone
                 """,
                     ClientePfModel.class)
                     .setParameter("nome", "%" + nome + "%")
-                    .setParameter("cpf", "%" + cpf + "%")
+                    .setParameter("cpf", "%" + cpf.replaceAll("[^0-9]", "") + "%")
                     .setParameter("telefone", "%" + telefone + "%")
                     .getResultList();
 
@@ -156,12 +154,12 @@ public class ClienteDao {
                     """
                 FROM ClientePjModel c
                 WHERE UPPER(c.razaoSocial) LIKE UPPER(:nome)
-                AND c.cnpj LIKE :cnpj
-                AND c.telefone LIKE :telefone
+                AND REPLACE(REPLACE(REPLACE(COALESCE(c.cnpj, ''), '.', ''), '-', ''), '/', '') LIKE :cnpj
+                AND COALESCE(c.telefone, '') LIKE :telefone
                 """,
                     ClientePjModel.class)
                     .setParameter("nome", "%" + nome + "%")
-                    .setParameter("cnpj", "%" + cnpj + "%")
+                    .setParameter("cnpj", "%" + cnpj.replaceAll("[^0-9]", "") + "%")
                     .setParameter("telefone", "%" + telefone + "%")
                     .getResultList();
 
@@ -202,11 +200,9 @@ public class ClienteDao {
 
         } catch (Exception e) {
 
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
 
-            e.printStackTrace();
+            throw new IllegalStateException("Não foi possível salvar a alteração no banco de dados.", e);
 
         } finally {
 

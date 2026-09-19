@@ -15,6 +15,7 @@ import util.SessaoUsuario;
 public class RelatoriosView extends javax.swing.JFrame {
 
     private boolean alterado = false;
+    private java.util.List<model.UsuarioModel> usuariosRelatorio;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(RelatoriosView.class.getName());
 
@@ -23,6 +24,7 @@ public class RelatoriosView extends javax.swing.JFrame {
      */
     public RelatoriosView() {
         initComponents();
+        configurarRelatorios();
         lblUsuarios.setVisible(
                 SessaoUsuario.isAdministrador()
         );
@@ -571,7 +573,7 @@ public class RelatoriosView extends javax.swing.JFrame {
     }//GEN-LAST:event_cbxStatusActionPerformed
 
     private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
-        // TODO add your handling code here:
+        txtDataInicial.setText(""); txtDataFinal.setText(""); cbxStatus.setSelectedIndex(0); cbxUsuario.setSelectedIndex(0);
     }//GEN-LAST:event_btnLimparActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
@@ -601,6 +603,49 @@ public class RelatoriosView extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new RelatoriosView().setVisible(true));
+    }
+
+    private void configurarRelatorios() {
+        cbxStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Lista de imóveis", "Lista de ativos", "Lista de Proprietários", "Lista de Clientes", "Vendidos"}));
+        cbxUsuario.addItem("Todos");
+        usuariosRelatorio = new dao.UsuarioDao().listar();
+        for (model.UsuarioModel u : usuariosRelatorio) cbxUsuario.addItem(u.getId() + " - " + u.getNome());
+        txtDataInicial.setToolTipText("dd/MM/aaaa (opcional)"); txtDataFinal.setToolTipText("dd/MM/aaaa (opcional)");
+        java.util.List<model.ImovelModel> imoveis = new dao.ImovelDao().listar();
+        lblTotalClientes.setText(String.valueOf(new dao.ClienteDao().listarPf().size() + new dao.ClienteDao().listarPj().size()));
+        lblTotalImoveis.setText(String.valueOf(imoveis.size()));
+        lblAtivos.setText(String.valueOf(imoveis.stream().filter(i -> "Ativo".equals(i.getStatusImovel())).count()));
+        lblVendidos.setText(String.valueOf(imoveis.stream().filter(i -> "Vendido".equals(i.getStatusImovel())).count()));
+        btnGerarArquivo.addActionListener(e -> gerarRelatorio());
+        atalho(lblUltimosVendidos, "Vendidos", true, false);
+        atalho(lblUltimosAdd, "Lista de imóveis", true, false);
+        atalho(lblAtivosRapido, "Lista de ativos", false, false);
+        atalho(lblProprietariosRapidos, "Lista de Proprietários", false, true);
+        atalho(lblClientesRapidos, "Lista de Clientes", false, true);
+    }
+    private void atalho(javax.swing.JLabel label, String tipo, boolean trintaDias, boolean meus) {
+        label.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        label.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                cbxStatus.setSelectedItem(tipo);
+                java.time.format.DateTimeFormatter formato = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                txtDataInicial.setText(trintaDias ? java.time.LocalDate.now().minusDays(29).format(formato) : "");
+                txtDataFinal.setText(trintaDias ? java.time.LocalDate.now().format(formato) : "");
+                cbxUsuario.setSelectedIndex(0);
+                if (meus && SessaoUsuario.getUsuarioLogado() != null) {
+                    for (int i=0;i<usuariosRelatorio.size();i++) if (usuariosRelatorio.get(i).getId().equals(SessaoUsuario.getUsuarioLogado().getId())) cbxUsuario.setSelectedIndex(i+1);
+                }
+                gerarRelatorio();
+            }
+        });
+    }
+    private void gerarRelatorio() {
+        try {
+            Long usuario = cbxUsuario.getSelectedIndex() <= 0 ? null : usuariosRelatorio.get(cbxUsuario.getSelectedIndex()-1).getId();
+            controller.RelatorioController.Resultado resultado = new controller.RelatorioController().gerar(cbxStatus.getSelectedItem().toString(),
+                util.Validador.data(txtDataInicial.getText(), "a data inicial"), util.Validador.data(txtDataFinal.getText(), "a data final"), usuario);
+            util.ExportadorPdf.escolherESalvar(this, resultado.titulo(), resultado.texto());
+        } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Não foi possível gerar", javax.swing.JOptionPane.ERROR_MESSAGE); }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

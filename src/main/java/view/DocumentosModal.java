@@ -13,6 +13,7 @@ import util.Navegador;
 public class DocumentosModal extends javax.swing.JFrame {
 
     private boolean alterado = false;
+    private AnexosPanel anexos;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DocumentosModal.class.getName());
 
@@ -21,6 +22,7 @@ public class DocumentosModal extends javax.swing.JFrame {
      */
     public DocumentosModal() {
         initComponents();
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     }
 
     /**
@@ -193,11 +195,14 @@ public class DocumentosModal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        Navegador.abrirTela(this, new NovoImovelView(), alterado);        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnSalvarArquivosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarArquivosActionPerformed
-        Navegador.abrirTela(this, new NovoImovelView(), alterado);        // TODO add your handling code here:
+        try {
+            if (anexos == null) throw new IllegalStateException("Abra os anexos pelo cadastro do imóvel.");
+            anexos.salvar(); dispose();
+        } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível salvar os anexos: " + e.getMessage()); }
     }//GEN-LAST:event_btnSalvarArquivosActionPerformed
 
     /**
@@ -223,6 +228,18 @@ public class DocumentosModal extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new DocumentosModal().setVisible(true));
+    }
+
+    public DocumentosModal(Long imovelId) {
+        this();
+        anexos = new AnexosPanel(imovelId, false);
+        btnSalvarArquivos.setFont(btnSalvarArquivos.getFont().deriveFont(14f));
+        pnlSemArquivos.removeAll();
+        pnlSemArquivos.setLayout(new java.awt.BorderLayout());
+        pnlSemArquivos.add(anexos, java.awt.BorderLayout.CENTER);
+        pnlSemArquivos.revalidate();
+        pack();
+        jLabel2.setText("Use Adicionar para selecionar arquivos (até 5 MB cada).");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -27,6 +27,7 @@ public class ClienteView extends javax.swing.JFrame {
      */
     public ClienteView() {
         initComponents();
+        tblCliente.setDefaultEditor(Object.class, null);
         lblUsuarios.setVisible(
                 SessaoUsuario.isAdministrador()
         );
@@ -427,7 +428,11 @@ public class ClienteView extends javax.swing.JFrame {
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     private void btnNovoClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoClienteActionPerformed
-        new NovoClienteModal().setVisible(true);
+        NovoClienteModal janela = new NovoClienteModal();
+        janela.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent e) { buscarClientes(); }
+        });
+        janela.setVisible(true);
     }//GEN-LAST:event_btnNovoClienteActionPerformed
 
     private void btnbuscarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnbuscarClienteActionPerformed

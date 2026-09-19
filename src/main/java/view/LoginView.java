@@ -151,32 +151,23 @@ public class LoginView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntrarActionPerformed
+        btnEntrar.setEnabled(false);
         String email = txtEmail.getText().trim();
-
         String senha = new String(txtSenha.getPassword());
-
-        UsuarioDao dao = new UsuarioDao();
-
-        UsuarioModel usuario = dao.autenticar(email, senha);
-
-        if (usuario != null) {
-
-            SessaoUsuario.setUsuarioLogado(usuario);
-
-            JOptionPane.showMessageDialog(this,
-                    "Bem-vindo, " + usuario.getNome());
-
-            new ListaImovelView().setVisible(true);
-
-            dispose();
-
-        } else {
-
-            JOptionPane.showMessageDialog(this,
-                    "Email ou senha inválidos!");
-
-        }
-
+        new javax.swing.SwingWorker<UsuarioModel, Void>() {
+            protected UsuarioModel doInBackground() { return new controller.LoginController().entrar(email, senha); }
+            protected void done() {
+                try {
+                    UsuarioModel usuario = get();
+                    if (usuario == null) { JOptionPane.showMessageDialog(LoginView.this, "E-mail ou senha inválidos."); return; }
+                    new ListaImovelView().setVisible(true);
+                    dispose();
+                } catch (Exception e) {
+                    Throwable causa = e.getCause() == null ? e : e.getCause();
+                    JOptionPane.showMessageDialog(LoginView.this, causa.getMessage(), "Não foi possível entrar", JOptionPane.ERROR_MESSAGE);
+                } finally { btnEntrar.setEnabled(true); txtSenha.setText(""); }
+            }
+        }.execute();
     }//GEN-LAST:event_btnEntrarActionPerformed
 
     private void lblNovaSenhaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblNovaSenhaMouseClicked
@@ -196,9 +187,7 @@ public class LoginView extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> {
-            new LoginView().setVisible(true);
-        });
+
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.

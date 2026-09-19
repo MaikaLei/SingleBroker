@@ -12,6 +12,7 @@ import util.SessaoUsuario;
 public class CriativosView extends javax.swing.JFrame {
 
     private boolean alterado = false;
+    private java.util.List<model.ImovelModel> imoveis;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CriativosView.class.getName());
 
@@ -20,6 +21,26 @@ public class CriativosView extends javax.swing.JFrame {
      */
     public CriativosView() {
         initComponents();
+        btnCopiar.setFont(btnCopiar.getFont().deriveFont(12f));
+        btnCopiar.setMargin(new java.awt.Insets(3, 6, 3, 6));
+        cbxImovel.addActionListener(e -> cbxImovel.setToolTipText(java.util.Objects.toString(cbxImovel.getSelectedItem(), "")));
+        imoveis = new dao.ImovelDao().listar();
+        for (model.ImovelModel i : imoveis) cbxImovel.addItem(i.getId() + " - " + i.getTipoImovel() + " - " + i.getCidade());
+        taCriativo.setLineWrap(true); taCriativo.setWrapStyleWord(true);
+        btnGerar.addActionListener(e -> {
+            int indice=cbxImovel.getSelectedIndex();
+            if (indice<0) { javax.swing.JOptionPane.showMessageDialog(this,"Cadastre um imóvel primeiro."); return; }
+            taCriativo.setText(new controller.CriativoController().gerar(imoveis.get(indice),cbxTipo.getSelectedItem().toString()));
+        });
+        btnCopiar.addActionListener(e -> {
+            if (taCriativo.getText().isBlank()) return;
+            java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new java.awt.datatransfer.StringSelection(taCriativo.getText()),null);
+            javax.swing.JOptionPane.showMessageDialog(this,"Texto copiado.");
+        });
+        btnExportar.addActionListener(e -> {
+            if (taCriativo.getText().isBlank()) { javax.swing.JOptionPane.showMessageDialog(this,"Gere um texto antes de exportar."); return; }
+            util.ExportadorPdf.escolherESalvar(this,"Apresentação do imóvel",taCriativo.getText());
+        });
         lblUsuarios.setVisible(
                 SessaoUsuario.isAdministrador()
         );

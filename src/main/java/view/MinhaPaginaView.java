@@ -13,9 +13,10 @@ import util.SessaoUsuario;
  *
  * @author maiko
  */
-public class MinhaPaginaView extends javax.swing.JFrame {
+public class MinhaPaginaView extends javax.swing.JFrame implements util.FormularioEditavel {
 
     private boolean alterado = false;
+    private model.MinhaPaginaModel pagina;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MinhaPaginaView.class.getName());
 
@@ -24,6 +25,16 @@ public class MinhaPaginaView extends javax.swing.JFrame {
      */
     public MinhaPaginaView() {
         initComponents();
+        carregarPagina();
+        util.AlteracoesFormulario.observar(getContentPane(), () -> alterado = true);
+        lblMudarFoto.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        lblMudarFoto.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent e) { escolherFoto(); }
+        });
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent e) { if (Navegador.podeSair(MinhaPaginaView.this, alterado)) dispose(); }
+        });
         lblUsuarios.setVisible(
                 SessaoUsuario.isAdministrador()
         );
@@ -410,7 +421,7 @@ public class MinhaPaginaView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnNovoImovelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoImovelActionPerformed
-        Navegador.abrirTela(this, new ListaImovelView(), alterado);        // TODO add your handling code here:
+        if (salvarAlteracoes()) javax.swing.JOptionPane.showMessageDialog(this, "Página salva com sucesso!");
     }//GEN-LAST:event_btnNovoImovelActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
@@ -440,6 +451,38 @@ public class MinhaPaginaView extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new MinhaPaginaView().setVisible(true));
+    }
+
+    private void carregarPagina() {
+        pagina = new dao.MinhaPaginaDao().carregar();
+        lblNomeUsuario.setText(SessaoUsuario.getUsuarioLogado().getNome());
+        lblCargo.setText(SessaoUsuario.getUsuarioLogado().getPerfil().name());
+        taTitulo1.setText(pagina.getTitulo());
+        taDescricao1.setText(pagina.getDescricao());
+        taBibliografia.setText(pagina.getBibliografia());
+        txtTelefone.setText(pagina.getTelefone());
+        txtEmail.setText(pagina.getEmail());
+        txtInstagram.setText(pagina.getInstagram());
+        atualizarFoto();
+    }
+    private void atualizarFoto() {
+        if (pagina.getFoto() != null) lblFotoPerfil.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(pagina.getFoto()).getImage().getScaledInstance(130, 130, java.awt.Image.SCALE_SMOOTH)));
+    }
+    private void escolherFoto() {
+        javax.swing.JFileChooser seletor = new javax.swing.JFileChooser();
+        seletor.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imagens", "png", "jpg", "jpeg", "gif"));
+        if (seletor.showOpenDialog(this) != javax.swing.JFileChooser.APPROVE_OPTION) return;
+        try { pagina.setFoto(controller.AnexoController.ler(seletor.getSelectedFile().toPath(), true).getConteudo()); atualizarFoto(); alterado=true; }
+        catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this,e.getMessage()); }
+    }
+    public boolean temAlteracoes() { return alterado; }
+    public boolean salvarAlteracoes() {
+        try {
+            pagina.setTitulo(taTitulo1.getText()); pagina.setDescricao(taDescricao1.getText());
+            pagina.setBibliografia(taBibliografia.getText()); pagina.setTelefone(txtTelefone.getText());
+            pagina.setEmail(txtEmail.getText()); pagina.setInstagram(txtInstagram.getText());
+            new controller.MinhaPaginaController().salvar(pagina); alterado=false; return true;
+        } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this,e.getMessage()); return false; }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

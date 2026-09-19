@@ -13,6 +13,8 @@ import util.Navegador;
 public class AgendaModal extends javax.swing.JFrame {
 
     private boolean alterado = false;
+    private java.time.LocalDate data = java.time.LocalDate.now();
+    private java.util.List<model.AgendaModel> tarefas = new java.util.ArrayList<>();
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AgendaModal.class.getName());
 
@@ -21,6 +23,11 @@ public class AgendaModal extends javax.swing.JFrame {
      */
     public AgendaModal() {
         initComponents();
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        tblAgenda.setDefaultEditor(Object.class, null);
+        tblAgenda.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent e) { if (e.getClickCount() == 2) editarSelecionada(); }
+        });
     }
 
     /**
@@ -96,11 +103,11 @@ public class AgendaModal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        Navegador.abrirTela(this, new AgendaView(), alterado);        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnAgendarTarefaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgendarTarefaActionPerformed
-        Navegador.abrirTela(this, new AgendaHoraModal(), alterado);        // TODO add your handling code here:
+        abrirEditor(null);
     }//GEN-LAST:event_btnAgendarTarefaActionPerformed
 
     /**
@@ -126,6 +133,41 @@ public class AgendaModal extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new AgendaModal().setVisible(true));
+    }
+
+
+    public AgendaModal(java.time.LocalDate data) {
+        this(); this.data = data; carregar();
+    }
+    private void carregar() {
+        lblDataAgenda.setText(data.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        try {
+            tarefas = new dao.AgendaDao().listar(data, data);
+            javax.swing.table.DefaultTableModel tabela = new javax.swing.table.DefaultTableModel(new String[]{"Horário", "Tipo", "Descrição", "Situação"}, 0) {
+                public boolean isCellEditable(int r, int c) { return false; }
+            };
+            for (model.AgendaModel t : tarefas) tabela.addRow(new Object[]{t.getHorario(), t.getTipo(), t.getDescricao(), t.isConcluida() ? "Concluída" : "Pendente"});
+            tblAgenda.setModel(tabela);
+        } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, e.getMessage()); }
+    }
+    private void abrirEditor(model.AgendaModel tarefa) {
+        AgendaHoraModal editor = new AgendaHoraModal(data, tarefa);
+        editor.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent e) { carregar(); }
+        });
+        editor.setVisible(true);
+    }
+    private void editarSelecionada() {
+        int linha = tblAgenda.getSelectedRow();
+        if (linha < 0) return;
+        model.AgendaModel tarefa = tarefas.get(tblAgenda.convertRowIndexToModel(linha));
+        Object[] opcoes = {"Editar", tarefa.isConcluida() ? "Reabrir" : "Concluir", "Excluir", "Cancelar"};
+        int escolha = javax.swing.JOptionPane.showOptionDialog(this, tarefa.getDescricao(), "Tarefa", javax.swing.JOptionPane.DEFAULT_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE, null, opcoes, opcoes[0]);
+        try {
+            if (escolha == 0) abrirEditor(tarefa);
+            else if (escolha == 1) { tarefa.setConcluida(!tarefa.isConcluida()); new controller.AgendaController().salvar(tarefa); carregar(); }
+            else if (escolha == 2 && javax.swing.JOptionPane.showConfirmDialog(this, "Excluir esta tarefa?", "Confirmar", javax.swing.JOptionPane.YES_NO_OPTION) == javax.swing.JOptionPane.YES_OPTION) { new dao.AgendaDao().excluir(tarefa.getId()); carregar(); }
+        } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, e.getMessage()); }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
