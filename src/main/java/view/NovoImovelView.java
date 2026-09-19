@@ -29,6 +29,7 @@ public class NovoImovelView extends javax.swing.JFrame implements util.Formulari
      */
     public NovoImovelView() {
         initComponents();
+        util.MascaraData.aplicar(txtDtEntrada, txtValidade);
         lblUsuarios.setVisible(
                 SessaoUsuario.isAdministrador()
         );

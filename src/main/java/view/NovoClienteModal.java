@@ -23,6 +23,7 @@ public class NovoClienteModal extends javax.swing.JFrame {
      */
     public NovoClienteModal() {
         initComponents();
+        util.MascaraData.aplicar(txtNascimento);
         jPanel1.setVisible(false);
         jPanel3.setVisible(false);
         jPanel2.setVisible(false);
@@ -33,6 +34,7 @@ public class NovoClienteModal extends javax.swing.JFrame {
     public NovoClienteModal(ClienteModel cliente) {
 
         initComponents();
+        util.MascaraData.aplicar(txtNascimento);
 
         jPanel1.setVisible(false);
         jPanel3.setVisible(false);

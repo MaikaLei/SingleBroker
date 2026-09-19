@@ -24,6 +24,7 @@ public class RelatoriosView extends javax.swing.JFrame {
      */
     public RelatoriosView() {
         initComponents();
+        util.MascaraData.aplicar(txtDataInicial, txtDataFinal);
         configurarRelatorios();
         lblUsuarios.setVisible(
                 SessaoUsuario.isAdministrador()
@@ -610,7 +611,8 @@ public class RelatoriosView extends javax.swing.JFrame {
         cbxUsuario.addItem("Todos");
         usuariosRelatorio = new dao.UsuarioDao().listar();
         for (model.UsuarioModel u : usuariosRelatorio) cbxUsuario.addItem(u.getId() + " - " + u.getNome());
-        txtDataInicial.setToolTipText("dd/MM/aaaa (opcional)"); txtDataFinal.setToolTipText("dd/MM/aaaa (opcional)");
+        txtDataInicial.setToolTipText("Data opcional: digite ddmmaaaa; as barras são automáticas.");
+        txtDataFinal.setToolTipText("Data opcional: digite ddmmaaaa; as barras são automáticas.");
         java.util.List<model.ImovelModel> imoveis = new dao.ImovelDao().listar();
         lblTotalClientes.setText(String.valueOf(new dao.ClienteDao().listarPf().size() + new dao.ClienteDao().listarPj().size()));
         lblTotalImoveis.setText(String.valueOf(imoveis.size()));
