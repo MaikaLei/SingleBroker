@@ -15,6 +15,7 @@ public class AgendaModal extends javax.swing.JFrame {
     private boolean alterado = false;
     private java.time.LocalDate data = java.time.LocalDate.now();
     private java.util.List<model.AgendaModel> tarefas = new java.util.ArrayList<>();
+    private final javax.swing.JButton btnExcluirAgendamento = new javax.swing.JButton("Excluir agendamento selecionado");
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AgendaModal.class.getName());
 
@@ -25,6 +26,13 @@ public class AgendaModal extends javax.swing.JFrame {
         initComponents();
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         tblAgenda.setDefaultEditor(Object.class, null);
+        tblAgenda.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        btnExcluirAgendamento.setFont(new java.awt.Font("Segoe UI", 0, 14));
+        btnExcluirAgendamento.setEnabled(false);
+        btnExcluirAgendamento.addActionListener(e -> excluirSelecionada());
+        tblAgenda.getSelectionModel().addListSelectionListener(e ->
+                btnExcluirAgendamento.setEnabled(tblAgenda.getSelectedRow() >= 0));
+        jPanel1.add(btnExcluirAgendamento, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 375, 450, 28));
         tblAgenda.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent e) { if (e.getClickCount() == 2) editarSelecionada(); }
         });
@@ -166,8 +174,26 @@ public class AgendaModal extends javax.swing.JFrame {
         try {
             if (escolha == 0) abrirEditor(tarefa);
             else if (escolha == 1) { tarefa.setConcluida(!tarefa.isConcluida()); new controller.AgendaController().salvar(tarefa); carregar(); }
-            else if (escolha == 2 && javax.swing.JOptionPane.showConfirmDialog(this, "Excluir esta tarefa?", "Confirmar", javax.swing.JOptionPane.YES_NO_OPTION) == javax.swing.JOptionPane.YES_OPTION) { new dao.AgendaDao().excluir(tarefa.getId()); carregar(); }
+            else if (escolha == 2) excluirSelecionada();
         } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, e.getMessage()); }
+    }
+
+    private void excluirSelecionada() {
+        int linha = tblAgenda.getSelectedRow();
+        if (linha < 0) return;
+        model.AgendaModel tarefa = tarefas.get(tblAgenda.convertRowIndexToModel(linha));
+        String mensagem = "Excluir o agendamento de " + tarefa.getHorario() + "?\n" + tarefa.getDescricao();
+        if (javax.swing.JOptionPane.showConfirmDialog(this, mensagem, "Excluir agendamento",
+                javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.WARNING_MESSAGE)
+                != javax.swing.JOptionPane.YES_OPTION) return;
+        try {
+            new dao.AgendaDao().excluir(tarefa.getId());
+            carregar();
+        } catch (RuntimeException e) {
+            logger.log(java.util.logging.Level.SEVERE, "Não foi possível excluir o agendamento.", e);
+            javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível excluir o agendamento.\n" + e.getMessage(),
+                    "Erro ao excluir", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
