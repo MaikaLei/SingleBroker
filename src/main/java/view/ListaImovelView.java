@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import dao.ImovelDao;
 import util.Navegador;
 import enums.PerfilUsuario;
@@ -27,14 +29,18 @@ public class ListaImovelView extends javax.swing.JFrame {
      * Creates new form ListaImovelView
      */
     public ListaImovelView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
 
-        if (SessaoUsuario.getUsuarioLogado().getPerfil()
-                != PerfilUsuario.ADMINISTRADOR) {
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
 
-            lblUsuarios.setVisible(false);
-        }
-
+        tblListaImoveis.setDefaultEditor(Object.class, null);
+        cbxStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Status", "Ativo", "Inativo", "Vendido", "Alugado", "Todos"}));
+        cbxCidade.removeAllItems(); cbxCidade.addItem("Cidade");
+        new dao.ImovelDao().listar().stream().map(model.ImovelModel::getCidade).filter(java.util.Objects::nonNull).distinct().sorted().forEach(cbxCidade::addItem);
         configurarTabela();
         carregarTabela();
     }
@@ -172,6 +178,9 @@ public class ListaImovelView extends javax.swing.JFrame {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblUsuariosMouseClicked(evt);
             }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblUsuariosMouseEntered(evt);
+            }
         });
 
         javax.swing.GroupLayout panelMenuLayout = new javax.swing.GroupLayout(panelMenu);
@@ -210,7 +219,7 @@ public class ListaImovelView extends javax.swing.JFrame {
                 .addComponent(lblRelatorios)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblUsuarios)
-                .addContainerGap(287, Short.MAX_VALUE))
+                .addContainerGap(246, Short.MAX_VALUE))
         );
 
         getContentPane().add(panelMenu, java.awt.BorderLayout.LINE_START);
@@ -355,7 +364,7 @@ public class ListaImovelView extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(22, 22, 22)
+                .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(btnNovoImovel, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -365,7 +374,7 @@ public class ListaImovelView extends javax.swing.JFrame {
                         .addComponent(txtCodigoBusca, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(panelLista, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(171, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -375,9 +384,9 @@ public class ListaImovelView extends javax.swing.JFrame {
                     .addComponent(btnNovoImovel)
                     .addComponent(txtCodigoBusca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
-                .addGap(31, 31, 31)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(panelLista, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18))
         );
@@ -432,15 +441,15 @@ public class ListaImovelView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnNovoImovelActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        Navegador.abrirTela(this, new cadastroUsuarioModalView(), alterado);
+        new ListaUsuarioModal().setVisible(true);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     private void btnFiltrarImovelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiltrarImovelActionPerformed
-        buscarImoveis();
+        try { buscarImoveis(); } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível buscar. Confira o código e a conexão com o banco."); }
     }//GEN-LAST:event_btnFiltrarImovelActionPerformed
 
     private void txtCodigoBuscaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodigoBuscaActionPerformed
-        buscarImoveis();
+        try { buscarImoveis(); } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível buscar. Confira o código e a conexão com o banco."); }
     }//GEN-LAST:event_txtCodigoBuscaActionPerformed
 
     private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
@@ -450,6 +459,10 @@ public class ListaImovelView extends javax.swing.JFrame {
     private void tblListaImoveisMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblListaImoveisMouseClicked
 
     }//GEN-LAST:event_tblListaImoveisMouseClicked
+
+    private void lblUsuariosMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseEntered
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblUsuariosMouseEntered
 
     /**
      * @param args the command line arguments
@@ -573,6 +586,21 @@ public class ListaImovelView extends javax.swing.JFrame {
                     "Erro ao abrir imóvel: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void configurarVisual() {
+
+        jScrollPane2.setPreferredSize(new java.awt.Dimension(800, 370));
+        pagina(this, panelMenu, "Imóveis", "Consulte seu portfólio e acompanhe cada negociação.", listagem(
+                cartao("Filtros de busca", coluna(grade(4, campo("Status", cbxStatus), campo("Transação", cbxTransacao), campo("Tipo", cbxTipo), campo("Cidade", cbxCidade)),
+                    grade(2, campo("Código do imóvel", txtCodigoBusca), acoes(btnLimpar, btnFiltrarImovel)))),
+                cartao("Imóveis cadastrados", resultado("Dê dois cliques para abrir os detalhes do imóvel.", jScrollPane2))), acoes(btnNovoImovel));
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

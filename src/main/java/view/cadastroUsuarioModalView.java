@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import dao.UsuarioDao;
 import enums.PerfilUsuario;
 import java.time.LocalDateTime;
@@ -14,6 +16,7 @@ import util.Navegador;
 public class cadastroUsuarioModalView extends javax.swing.JFrame {
 
     private boolean alterado = false;
+    private UsuarioModel usuarioEdicao;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(cadastroUsuarioModalView.class.getName());
 
@@ -21,7 +24,9 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
      * Creates new form NovoClienteModal
      */
     public cadastroUsuarioModalView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
     }
 
     /**
@@ -49,7 +54,7 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
         btnSalvar = new javax.swing.JButton();
         cbxTipoUsuario = new javax.swing.JComboBox<>();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -81,8 +86,6 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
         txtNome.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtNome.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         jPanel3.add(txtNome, new org.netbeans.lib.awtextra.AbsoluteConstraints(114, 46, 323, -1));
-
-        txtSenha.setText("jPasswordField1");
         jPanel3.add(txtSenha, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 110, 320, -1));
 
         jLabel24.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -106,7 +109,7 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
                 btnCancelarActionPerformed(evt);
             }
         });
-        jPanel3.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 210, -1, -1));
+        jPanel3.add(btnCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 210, -1, -1));
 
         btnSalvar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/add.png"))); // NOI18N
@@ -135,15 +138,28 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         try {
 
-            UsuarioModel usuario = new UsuarioModel();
+            UsuarioDao dao = new UsuarioDao();
+
+            UsuarioModel usuario;
+
+            if (usuarioEdicao != null) {
+
+                usuario = new UsuarioDao().buscarPorId(usuarioEdicao.getId());
+
+            } else {
+
+                usuario = new UsuarioModel();
+                usuario.setDataCadastro(LocalDateTime.now());
+
+            }
 
             usuario.setNome(txtNome.getText().trim());
 
             usuario.setEmail(txtEmail.getText().trim());
 
-            usuario.setSenha(
-                    new String(txtSenha.getPassword())
-            );
+            String senha = new String(txtSenha.getPassword());
+
+
 
             usuario.setPerfil(
                     PerfilUsuario.valueOf(
@@ -152,19 +168,29 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
             );
 
             usuario.setAtivo(
-                    cbxStatus.getSelectedItem().toString().equals("ATIVO")
+                    cbxStatus.getSelectedItem()
+                            .toString()
+                            .equals("ATIVO")
             );
 
-            usuario.setDataCadastro(LocalDateTime.now());
+            if (usuarioEdicao != null) {
 
-            UsuarioDao dao = new UsuarioDao();
+                new controller.UsuarioController().salvar(usuario, senha);
 
-            dao.salvar(usuario);
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Usuário atualizado com sucesso!"
+                );
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Usuário cadastrado com sucesso!"
-            );
+            } else {
+
+                new controller.UsuarioController().salvar(usuario, senha);
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Usuário cadastrado com sucesso!"
+                );
+            }
 
             dispose();
 
@@ -172,11 +198,9 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Erro ao cadastrar usuário:\n" + e.getMessage()
+                    "Erro ao salvar usuário:\n" + e.getMessage()
             );
-
         }
-
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     /**
@@ -202,6 +226,42 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new cadastroUsuarioModalView().setVisible(true));
+    }
+
+    public cadastroUsuarioModalView(UsuarioModel usuario) {
+
+        util.Tema.instalar();
+        initComponents();
+        configurarVisual();
+
+        this.usuarioEdicao = usuario;
+
+        txtNome.setText(usuario.getNome());
+        txtEmail.setText(usuario.getEmail());
+        txtSenha.setText("");
+        txtSenha.setToolTipText("Deixe em branco para manter a senha atual.");
+
+        cbxTipoUsuario.setSelectedItem(
+                usuario.getPerfil().name()
+        );
+
+        cbxStatus.setSelectedItem(
+                usuario.getAtivo() ? "ATIVO" : "INATIVO"
+        );
+    }
+
+    private void configurarVisual() {
+
+        txtSenha.putClientProperty("JTextField.placeholderText", "Mínimo de 6 caracteres");
+        modal(this, "Cadastro de usuário", "Configure os dados e o acesso ao sistema.",
+                cartao("Dados de acesso", coluna(campo("Nome", txtNome), campo("E-mail", txtEmail), campo("Senha", txtSenha),
+                    grade(2, campo("Perfil", cbxTipoUsuario), campo("Status", cbxStatus)))), acoes(btnCancelar, btnSalvar), 650, 660);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

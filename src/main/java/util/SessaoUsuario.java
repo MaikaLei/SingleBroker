@@ -1,6 +1,7 @@
 package util;
 
 import model.UsuarioModel;
+import enums.PerfilUsuario;
 
 /**
  *
@@ -20,5 +21,11 @@ public class SessaoUsuario {
 
     public static void encerrarSessao() {
         usuarioLogado = null;
+    }
+    
+    public static boolean isAdministrador() {
+
+        return usuarioLogado != null
+                && usuarioLogado.getPerfil() == PerfilUsuario.ADMINISTRADOR;
     }
 }

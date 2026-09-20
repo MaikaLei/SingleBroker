@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import java.awt.Color;
 import util.Navegador;
 import dao.ClienteDao;
@@ -10,6 +12,7 @@ import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 import model.ClienteModel;
+import util.SessaoUsuario;
 
 /**
  *
@@ -25,7 +28,13 @@ public class ClienteView extends javax.swing.JFrame {
      * Creates new form ListaImovelView
      */
     public ClienteView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
+        tblCliente.setDefaultEditor(Object.class, null);
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
         tblCliente.addMouseListener(new java.awt.event.MouseAdapter() {
 
             @Override
@@ -419,11 +428,15 @@ public class ClienteView extends javax.swing.JFrame {
     }//GEN-LAST:event_cbxTipoClienteActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        // TODO add your handling code here:
+        Navegador.abrirTela(this, new ListaUsuarioModal(), alterado);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     private void btnNovoClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoClienteActionPerformed
-        new NovoClienteModal().setVisible(true);
+        NovoClienteModal janela = new NovoClienteModal();
+        janela.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent e) { buscarClientes(); }
+        });
+        janela.setVisible(true);
     }//GEN-LAST:event_btnNovoClienteActionPerformed
 
     private void btnbuscarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnbuscarClienteActionPerformed
@@ -553,6 +566,20 @@ public class ClienteView extends javax.swing.JFrame {
             }
         }
 
+    }
+
+    private void configurarVisual() {
+
+        jScrollPane2.setPreferredSize(new java.awt.Dimension(800, 370));
+        pagina(this, panelMenu, "Clientes", "Encontre clientes e mantenha seus dados atualizados.", listagem(
+                cartao("Filtros de busca", coluna(grade(4, campo("Tipo", cbxTipoCliente), campo("CPF / CNPJ", txtCpfCnpj), campo("Nome", txtNomeCliente), campo("Telefone", txtTelefone)), acoes(btnbuscarCliente))),
+                cartao("Clientes cadastrados", resultado("Dê dois cliques em um cliente para editar seu cadastro.", jScrollPane2))), acoes(btnNovoCliente));
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -95,6 +95,22 @@ public class ImovelModel {
 
     private Boolean ativo = true;
 
+
+    private java.time.LocalDate dataCadastro;
+    @jakarta.persistence.ManyToOne
+    @jakarta.persistence.JoinColumn(name="usuario_cadastro_id")
+    private UsuarioModel usuarioCadastro;
+    public java.time.LocalDate getDataCadastro() { return dataCadastro; }
+    public void setDataCadastro(java.time.LocalDate v) { dataCadastro=v; }
+    public UsuarioModel getUsuarioCadastro() { return usuarioCadastro; }
+    public void setUsuarioCadastro(UsuarioModel v) { usuarioCadastro=v; }
+    private java.time.LocalDate dataVenda;
+    private String identificacaoGaragem;
+    public java.time.LocalDate getDataVenda() { return dataVenda; }
+    public void setDataVenda(java.time.LocalDate v) { dataVenda=v; }
+    public String getIdentificacaoGaragem() { return identificacaoGaragem; }
+    public void setIdentificacaoGaragem(String v) { identificacaoGaragem=v; }
+
     public Long getId() {
         return id;
     }

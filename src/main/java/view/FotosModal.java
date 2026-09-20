@@ -4,6 +4,8 @@
  */
 package view;
 
+import static util.LayoutTela.*;
+
 import util.Navegador;
 
 /**
@@ -13,6 +15,7 @@ import util.Navegador;
 public class FotosModal extends javax.swing.JFrame {
 
     private boolean alterado = false;
+    private AnexosPanel anexos;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FotosModal.class.getName());
 
@@ -20,7 +23,10 @@ public class FotosModal extends javax.swing.JFrame {
      * Creates new form FotosModal
      */
     public FotosModal() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     }
 
     /**
@@ -149,11 +155,14 @@ public class FotosModal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        Navegador.abrirTela(this, new NovoImovelView(), alterado);        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnSalvarImovelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarImovelActionPerformed
-        Navegador.abrirTela(this, new NovoImovelView(), alterado);        // TODO add your handling code here:
+        try {
+            if (anexos == null) throw new IllegalStateException("Abra os anexos pelo cadastro do imóvel.");
+            anexos.salvar(); dispose();
+        } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível salvar os anexos: " + e.getMessage()); }
     }//GEN-LAST:event_btnSalvarImovelActionPerformed
 
     /**
@@ -179,6 +188,30 @@ public class FotosModal extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new FotosModal().setVisible(true));
+    }
+
+    public FotosModal(Long imovelId) {
+        this();
+        anexos = new AnexosPanel(imovelId, true);
+        pnlSemFotos.removeAll();
+        pnlSemFotos.setLayout(new java.awt.BorderLayout());
+        pnlSemFotos.add(anexos, java.awt.BorderLayout.CENTER);
+        pnlSemFotos.revalidate();
+        configurarVisual();
+        jLabel2.setText("Use Adicionar para selecionar arquivos (até 5 MB cada).");
+    }
+
+    private void configurarVisual() {
+        javax.swing.JComponent conteudo = anexos == null ? pnlSemFotos : anexos;
+        conteudo.setPreferredSize(new java.awt.Dimension(680, 330));
+        modal(this, "Fotos do imóvel", "Adicione arquivos de até 5 MB cada. Confirme as alterações em Salvar.",
+            expandir(cartao("Arquivos do imóvel", conteudo)), acoes(btnCancelar, btnSalvarImovel), 820, 610);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

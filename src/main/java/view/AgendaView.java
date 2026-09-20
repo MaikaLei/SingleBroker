@@ -4,9 +4,12 @@
  */
 package view;
 
+import static util.LayoutTela.*;
+
 import util.Navegador;
 
 import java.awt.Color;
+import util.SessaoUsuario;
 
 /**
  *
@@ -22,7 +25,20 @@ public class AgendaView extends javax.swing.JFrame {
      * Creates new form ListaImovelView
      */
     public AgendaView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
+        int ano = java.time.LocalDate.now().getYear();
+        cbxAno.removeAllItems();
+        for (int a = ano - 10; a <= ano + 10; a++) cbxAno.addItem(String.valueOf(a));
+        cbxAno.setSelectedItem(String.valueOf(ano));
+        cbxMes.setSelectedIndex(java.time.LocalDate.now().getMonthValue() - 1);
+        cbxMes.addActionListener(e -> atualizarCalendario());
+        cbxAno.addActionListener(e -> atualizarCalendario());
+        atualizarCalendario();
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
     }
 
     /**
@@ -781,175 +797,175 @@ public class AgendaView extends javax.swing.JFrame {
     }//GEN-LAST:event_lblRelatoriosMouseClicked
 
     private void btnGrid1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid1ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid1);
     }//GEN-LAST:event_btnGrid1ActionPerformed
 
     private void btnGrid8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid8ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid8);
     }//GEN-LAST:event_btnGrid8ActionPerformed
 
     private void btnGrid15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid15ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid15);
     }//GEN-LAST:event_btnGrid15ActionPerformed
 
     private void btnGrid22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid22ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid22);
     }//GEN-LAST:event_btnGrid22ActionPerformed
 
     private void btnGrid29ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid29ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid29);
     }//GEN-LAST:event_btnGrid29ActionPerformed
 
     private void btnGrid36ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid36ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid36);
     }//GEN-LAST:event_btnGrid36ActionPerformed
 
     private void btnGrid2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid2ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid2);
     }//GEN-LAST:event_btnGrid2ActionPerformed
 
     private void btnGrid3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid3ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid3);
     }//GEN-LAST:event_btnGrid3ActionPerformed
 
     private void btnGrid4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid4ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid4);
     }//GEN-LAST:event_btnGrid4ActionPerformed
 
     private void btnGrid5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid5ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid5);
     }//GEN-LAST:event_btnGrid5ActionPerformed
 
     private void btnGrid6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid6ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid6);
     }//GEN-LAST:event_btnGrid6ActionPerformed
 
     private void btnGrid7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid7ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid7);
     }//GEN-LAST:event_btnGrid7ActionPerformed
 
     private void btnGrid9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid9ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid9);
     }//GEN-LAST:event_btnGrid9ActionPerformed
 
     private void btnGrid10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid10ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid10);
     }//GEN-LAST:event_btnGrid10ActionPerformed
 
     private void btnGrid11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid11ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid11);
     }//GEN-LAST:event_btnGrid11ActionPerformed
 
     private void btnGrid12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid12ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid12);
     }//GEN-LAST:event_btnGrid12ActionPerformed
 
     private void btnGrid13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid13ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid13);
     }//GEN-LAST:event_btnGrid13ActionPerformed
 
     private void btnGrid14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid14ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid14);
     }//GEN-LAST:event_btnGrid14ActionPerformed
 
     private void btnGrid16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid16ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid16);
     }//GEN-LAST:event_btnGrid16ActionPerformed
 
     private void btnGrid23ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid23ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid23);
     }//GEN-LAST:event_btnGrid23ActionPerformed
 
     private void btnGrid30ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid30ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid30);
     }//GEN-LAST:event_btnGrid30ActionPerformed
 
     private void btnGrid37ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid37ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid37);
     }//GEN-LAST:event_btnGrid37ActionPerformed
 
     private void btnGrid17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid17ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid17);
     }//GEN-LAST:event_btnGrid17ActionPerformed
 
     private void btnGrid24ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid24ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid24);
     }//GEN-LAST:event_btnGrid24ActionPerformed
 
     private void btnGrid31ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid31ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid31);
     }//GEN-LAST:event_btnGrid31ActionPerformed
 
     private void btnGrid38ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid38ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid38);
     }//GEN-LAST:event_btnGrid38ActionPerformed
 
     private void btnGrid18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid18ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid18);
     }//GEN-LAST:event_btnGrid18ActionPerformed
 
     private void btnGrid25ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid25ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid25);
     }//GEN-LAST:event_btnGrid25ActionPerformed
 
     private void btnGrid32ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid32ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid32);
     }//GEN-LAST:event_btnGrid32ActionPerformed
 
     private void btnGrid39ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid39ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid39);
     }//GEN-LAST:event_btnGrid39ActionPerformed
 
     private void btnGrid19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid19ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid19);
     }//GEN-LAST:event_btnGrid19ActionPerformed
 
     private void btnGrid26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid26ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid26);
     }//GEN-LAST:event_btnGrid26ActionPerformed
 
     private void btnGrid33ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid33ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid33);
     }//GEN-LAST:event_btnGrid33ActionPerformed
 
     private void btnGrid40ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid40ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid40);
     }//GEN-LAST:event_btnGrid40ActionPerformed
 
     private void btnGrid20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid20ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid20);
     }//GEN-LAST:event_btnGrid20ActionPerformed
 
     private void btnGrid27ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid27ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid27);
     }//GEN-LAST:event_btnGrid27ActionPerformed
 
     private void btnGrid34ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid34ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid34);
     }//GEN-LAST:event_btnGrid34ActionPerformed
 
     private void btnGrid41ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid41ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid41);
     }//GEN-LAST:event_btnGrid41ActionPerformed
 
     private void btnGrid21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid21ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid21);
     }//GEN-LAST:event_btnGrid21ActionPerformed
 
     private void btnGrid28ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid28ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid28);
     }//GEN-LAST:event_btnGrid28ActionPerformed
 
     private void btnGrid35ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid35ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid35);
     }//GEN-LAST:event_btnGrid35ActionPerformed
 
     private void btnGrid42ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGrid42ActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        abrirDia(btnGrid42);
     }//GEN-LAST:event_btnGrid42ActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        // TODO add your handling code here:
+        Navegador.abrirTela(this, new ListaUsuarioModal(), alterado);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     /**
@@ -975,6 +991,59 @@ public class AgendaView extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new AgendaView().setVisible(true));
+    }
+
+
+    private void atualizarCalendario() {
+        if (cbxAno.getSelectedItem() == null) return;
+        java.time.YearMonth mes = java.time.YearMonth.of(Integer.parseInt(cbxAno.getSelectedItem().toString()), cbxMes.getSelectedIndex() + 1);
+        java.util.Map<java.time.LocalDate, Long> totais = new java.util.HashMap<>();
+        try {
+            for (model.AgendaModel tarefa : new dao.AgendaDao().listar(mes.atDay(1), mes.atEndOfMonth()))
+                if (!tarefa.isConcluida()) totais.merge(tarefa.getData(), 1L, Long::sum);
+        } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível carregar a agenda: " + e.getMessage()); }
+        javax.swing.JButton[] botoes = new javax.swing.JButton[]{btnGrid1, btnGrid2, btnGrid3, btnGrid4, btnGrid5, btnGrid6, btnGrid7, btnGrid8, btnGrid9, btnGrid10, btnGrid11, btnGrid12, btnGrid13, btnGrid14, btnGrid15, btnGrid16, btnGrid17, btnGrid18, btnGrid19, btnGrid20, btnGrid21, btnGrid22, btnGrid23, btnGrid24, btnGrid25, btnGrid26, btnGrid27, btnGrid28, btnGrid29, btnGrid30, btnGrid31, btnGrid32, btnGrid33, btnGrid34, btnGrid35, btnGrid36, btnGrid37, btnGrid38, btnGrid39, btnGrid40, btnGrid41, btnGrid42};
+        int inicio = mes.atDay(1).getDayOfWeek().getValue() % 7;
+        for (int i = 0; i < botoes.length; i++) {
+            int dia = i - inicio + 1;
+            boolean valido = dia >= 1 && dia <= mes.lengthOfMonth();
+            java.time.LocalDate data = valido ? mes.atDay(dia) : null;
+            botoes[i].putClientProperty("data", data);
+            botoes[i].setEnabled(valido);
+            long total = valido ? totais.getOrDefault(data, 0L) : 0;
+            botoes[i].setText(valido ? String.valueOf(dia) + (total > 0 ? " (" + total + ")" : "") : "");
+            util.Tema.dia(botoes[i]);
+            botoes[i].setToolTipText(valido ? total + " tarefa(s) pendente(s)" : null);
+        }
+    }
+    private void abrirDia(javax.swing.JButton botao) {
+        java.time.LocalDate data = (java.time.LocalDate) botao.getClientProperty("data");
+        if (data == null) return;
+        AgendaModal janela = new AgendaModal(data);
+        janela.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent e) { atualizarCalendario(); }
+        });
+        janela.setVisible(true);
+    }
+
+    private void configurarVisual() {
+
+        javax.swing.JPanel dias = painel(new java.awt.GridLayout(0, 7, 8, 6));
+        javax.swing.JPanel semana = painel(new java.awt.GridLayout(1, 7, 8, 0));
+        for (String dia : new String[]{"Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"}) {
+            var rotulo = titulo(dia, 13); rotulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER); semana.add(rotulo);
+        }
+        javax.swing.JButton[] botoes = new javax.swing.JButton[]{btnGrid1, btnGrid2, btnGrid3, btnGrid4, btnGrid5, btnGrid6, btnGrid7, btnGrid8, btnGrid9, btnGrid10, btnGrid11, btnGrid12, btnGrid13, btnGrid14, btnGrid15, btnGrid16, btnGrid17, btnGrid18, btnGrid19, btnGrid20, btnGrid21, btnGrid22, btnGrid23, btnGrid24, btnGrid25, btnGrid26, btnGrid27, btnGrid28, btnGrid29, btnGrid30, btnGrid31, btnGrid32, btnGrid33, btnGrid34, btnGrid35, btnGrid36, btnGrid37, btnGrid38, btnGrid39, btnGrid40, btnGrid41, btnGrid42};
+        for (javax.swing.JButton botao : botoes) { botao.setPreferredSize(new java.awt.Dimension(90, 38)); dias.add(botao); }
+        pagina(this, panelMenu, "Minha agenda", "Clique em um dia para consultar, criar ou excluir agendamentos.",
+            cartao("", coluna(grade(2, campo("Mês", cbxMes), campo("Ano", cbxAno)), semana, dias,
+                titulo("O dia atual aparece em azul. Os números entre parênteses indicam tarefas pendentes.", 13))), null);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

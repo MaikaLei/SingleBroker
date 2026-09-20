@@ -1,13 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
-
-/**
- *
- * @author maiko
- */
+import dao.UsuarioDao;
+import model.UsuarioModel;
+import util.*;
 public class LoginController {
-    
+    public UsuarioModel entrar(String email, String senha) {
+        Validador.obrigatorio(email, "o e-mail");
+        Validador.obrigatorio(senha, "a senha");
+        UsuarioModel usuario = new UsuarioDao().autenticar(email, senha);
+        if (usuario != null) SessaoUsuario.setUsuarioLogado(usuario);
+        return usuario;
+    }
 }

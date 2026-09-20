@@ -4,17 +4,21 @@
  */
 package view;
 
+import static util.LayoutTela.*;
+
 import util.Navegador;
 
 import java.awt.Color;
+import util.SessaoUsuario;
 
 /**
  *
  * @author maiko
  */
-public class MinhaPaginaView extends javax.swing.JFrame {
+public class MinhaPaginaView extends javax.swing.JFrame implements util.FormularioEditavel {
 
     private boolean alterado = false;
+    private model.MinhaPaginaModel pagina;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MinhaPaginaView.class.getName());
 
@@ -22,7 +26,22 @@ public class MinhaPaginaView extends javax.swing.JFrame {
      * Creates new form ListaImovelView
      */
     public MinhaPaginaView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
+        carregarPagina();
+        util.AlteracoesFormulario.observar(getContentPane(), () -> alterado = true);
+        lblMudarFoto.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        lblMudarFoto.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent e) { escolherFoto(); }
+        });
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent e) { if (Navegador.podeSair(MinhaPaginaView.this, alterado)) dispose(); }
+        });
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
     }
 
     /**
@@ -406,11 +425,11 @@ public class MinhaPaginaView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnNovoImovelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoImovelActionPerformed
-        Navegador.abrirTela(this, new ListaImovelView(), alterado);        // TODO add your handling code here:
+        if (salvarAlteracoes()) javax.swing.JOptionPane.showMessageDialog(this, "Página salva com sucesso!");
     }//GEN-LAST:event_btnNovoImovelActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        // TODO add your handling code here:
+        Navegador.abrirTela(this, new ListaUsuarioModal(), alterado);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     /**
@@ -436,6 +455,59 @@ public class MinhaPaginaView extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new MinhaPaginaView().setVisible(true));
+    }
+
+    private void carregarPagina() {
+        pagina = new dao.MinhaPaginaDao().carregar();
+        lblNomeUsuario.setText(SessaoUsuario.getUsuarioLogado().getNome());
+        lblCargo.setText(SessaoUsuario.getUsuarioLogado().getPerfil().name());
+        taTitulo1.setText(pagina.getTitulo());
+        taDescricao1.setText(pagina.getDescricao());
+        taBibliografia.setText(pagina.getBibliografia());
+        txtTelefone.setText(pagina.getTelefone());
+        txtEmail.setText(pagina.getEmail());
+        txtInstagram.setText(pagina.getInstagram());
+        atualizarFoto();
+    }
+    private void atualizarFoto() {
+        lblFotoPerfil.setText(pagina.getFoto() == null ? "Sua foto" : "");
+        if (pagina.getFoto() != null) lblFotoPerfil.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(pagina.getFoto()).getImage().getScaledInstance(130, 130, java.awt.Image.SCALE_SMOOTH)));
+    }
+    private void escolherFoto() {
+        javax.swing.JFileChooser seletor = new javax.swing.JFileChooser();
+        seletor.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imagens", "png", "jpg", "jpeg", "gif"));
+        if (seletor.showOpenDialog(this) != javax.swing.JFileChooser.APPROVE_OPTION) return;
+        try { pagina.setFoto(controller.AnexoController.ler(seletor.getSelectedFile().toPath(), true).getConteudo()); atualizarFoto(); alterado=true; }
+        catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this,e.getMessage()); }
+    }
+    public boolean temAlteracoes() { return alterado; }
+    public boolean salvarAlteracoes() {
+        try {
+            pagina.setTitulo(taTitulo1.getText()); pagina.setDescricao(taDescricao1.getText());
+            pagina.setBibliografia(taBibliografia.getText()); pagina.setTelefone(txtTelefone.getText());
+            pagina.setEmail(txtEmail.getText()); pagina.setInstagram(txtInstagram.getText());
+            new controller.MinhaPaginaController().salvar(pagina); alterado=false; return true;
+        } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this,e.getMessage()); return false; }
+    }
+
+    private void configurarVisual() {
+
+        lblFotoPerfil.setPreferredSize(new java.awt.Dimension(140, 140));
+        lblFotoPerfil.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        if (lblFotoPerfil.getIcon() == null) lblFotoPerfil.setText("Sua foto");
+        lblMudarFoto.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        pagina(this, panelMenu, "Minha página", "Mantenha sua apresentação e seus contatos atualizados.", coluna(
+                cartao("Perfil", grade(2, coluna(lblFotoPerfil, lblMudarFoto), coluna(lblNomeUsuario, campo("Perfil de acesso", lblCargo),
+                    campo("Título profissional", texto(taTitulo1, 58))))),
+                cartao("Contato", grade(3, campo("Telefone", txtTelefone), campo("E-mail", txtEmail), campo("Instagram", txtInstagram))),
+                cartao("Apresentação", coluna(campo("Breve descrição", texto(taDescricao1, 92)), campo("Biografia", texto(taBibliografia, 130))))),
+                acoes(btnCancelar, btnNovoImovel));
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

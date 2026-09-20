@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import dao.ClienteDao;
 import java.awt.Color;
 import util.Navegador;
@@ -10,15 +12,17 @@ import javax.swing.JOptionPane;
 import model.ClienteModel;
 import model.ClientePfModel;
 import model.ClientePjModel;
+import util.SessaoUsuario;
 
 /**
  *
  * @author Maikon
  */
-public class NovoImovelView extends javax.swing.JFrame {
+public class NovoImovelView extends javax.swing.JFrame implements util.FormularioEditavel {
 
     private boolean alterado = false;
     private ClienteModel proprietarioSelecionado;
+    private ImovelModel imovelEdicao;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(NovoImovelView.class.getName());
 
@@ -26,7 +30,20 @@ public class NovoImovelView extends javax.swing.JFrame {
      * Creates new form ListaImovelView
      */
     public NovoImovelView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
+        util.MascaraData.aplicar(txtDtEntrada, txtValidade);
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
+        util.AlteracoesFormulario.observar(getContentPane(), () -> alterado = true);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                if (Navegador.podeSair(NovoImovelView.this, alterado)) dispose();
+            }
+        });
     }
 
     /**
@@ -1129,11 +1146,11 @@ public class NovoImovelView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnNovoClienteActionPerformed
 
     private void bntAddFotosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntAddFotosActionPerformed
-        Navegador.abrirTela(this, new FotosModal(), alterado);
+        abrirAnexos(true);
     }//GEN-LAST:event_bntAddFotosActionPerformed
 
     private void btnAddDocsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddDocsActionPerformed
-        Navegador.abrirTela(this, new DocumentosModal(), alterado);        // TODO add your handling code here:
+        abrirAnexos(false);
     }//GEN-LAST:event_btnAddDocsActionPerformed
 
     private void btnSalvarImovelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarImovelActionPerformed
@@ -1145,7 +1162,7 @@ public class NovoImovelView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelarImovelActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        // TODO add your handling code here:
+        Navegador.abrirTela(this, new ListaUsuarioModal(), alterado);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     /**
@@ -1177,6 +1194,7 @@ public class NovoImovelView extends javax.swing.JFrame {
             ClienteModel cliente) {
 
         this.proprietarioSelecionado = cliente;
+        alterado = true;
 
         if (cliente instanceof ClientePfModel pf) {
 
@@ -1193,14 +1211,23 @@ public class NovoImovelView extends javax.swing.JFrame {
     }
 
     private void salvarImovel() {
+        if (salvarAlteracoes()) {
+            JOptionPane.showMessageDialog(this, "Imóvel salvo com sucesso!");
+            Navegador.abrirTela(this, new ListaImovelView(), false);
+        }
+    }
+
+    public boolean temAlteracoes() { return alterado; }
+
+    public boolean salvarAlteracoes() {
 
         try {
             if (proprietarioSelecionado == null) {
                 JOptionPane.showMessageDialog(this, "Selecione um proprietário.");
-                return;
+                return false;
             }
 
-            ImovelModel imovel = new ImovelModel();
+            ImovelModel imovel = imovelEdicao == null ? new ImovelModel() : new ImovelDao().buscarPorId(imovelEdicao.getId());
 
             imovel.setTipoImovel(cbxTipoImovel.getSelectedItem().toString());
             imovel.setTransacao(cbxTransacao.getSelectedItem().toString());
@@ -1242,6 +1269,7 @@ public class NovoImovelView extends javax.swing.JFrame {
             imovel.setLavanderia(parseInt(txtLav.getText()));
             imovel.setVagasGaragem(parseInt(txtGar.getText()));
             imovel.setSacada(parseInt(txtSac.getText()));
+            imovel.setIdentificacaoGaragem(txtIdGar.getText());
 
             imovel.setPatio(rbPatio.isSelected());
             imovel.setVaranda(rbVaranda.isSelected());
@@ -1266,44 +1294,129 @@ public class NovoImovelView extends javax.swing.JFrame {
             imovel.setAcademia(rbAcademia.isSelected());
             imovel.setEspacoPet(rbEspacoPet.isSelected());
             imovel.setCoworking(rbCoworking.isSelected());
+            imovel.setCameras(rbCamera.isSelected());
+            imovel.setPiscinaCasa(rbPiscinaCasa.isSelected());
 
-            imovel.setAreaTotal(parseBigDecimal(txtArPriv.getText()));
-            imovel.setAreaPrivativa(parseBigDecimal(txtArTot.getText()));
+            imovel.setAreaTotal(parseBigDecimal(txtArTot.getText()));
+            imovel.setAreaPrivativa(parseBigDecimal(txtArPriv.getText()));
             imovel.setAreaTerreno(parseBigDecimal(txtArLt.getText()));
 
-            ImovelDao dao = new ImovelDao();
-            dao.salvar(imovel);
-
-            JOptionPane.showMessageDialog(this, "Imóvel salvo com sucesso!");
-
-            Navegador.abrirTela(this, new ListaImovelView(), alterado);
+            new controller.ImovelController().salvar(imovel);
+            imovelEdicao = imovel;
+            alterado = false;
+            return true;
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Erro ao salvar: " + e.getMessage());
-            e.printStackTrace();
+            return false;
         }
     }
 
-    private Integer parseInt(String valor) {
-        try {
-            if (valor == null || valor.trim().isEmpty()) {
-                return null;
-            }
-            return Integer.parseInt(valor.trim());
-        } catch (Exception e) {
-            return null;
-        }
+    private Integer parseInt(String valor) { return util.Validador.inteiro(valor, "Quantidade"); }
+    private java.math.BigDecimal parseBigDecimal(String valor) { return util.Validador.decimal(valor, "área"); }
+
+    public NovoImovelView(ImovelModel imovel) {
+        this();
+        this.imovelEdicao = imovel;
+        txtIdGar.setText(imovel.getIdentificacaoGaragem());
+        setProprietarioSelecionado(imovel.getProprietario());
+        txtEndereco.setText(imovel.getEndereco());
+        txtNumero.setText(imovel.getNumero());
+        txtComplemento.setText(imovel.getComplemento());
+        txtBairro.setText(imovel.getBairro());
+        txtCidade.setText(imovel.getCidade());
+        txtEstado.setText(imovel.getEstado());
+        txtCep.setText(imovel.getCep());
+        txtResponsavel.setText(imovel.getResponsavel());
+        txtDtEntrada.setText(imovel.getDataEntrada());
+        txtValidade.setText(imovel.getValidadeContrato());
+        txtValor.setText(imovel.getValor());
+        txtAdm.setText(imovel.getValorAdministracao());
+        txtValorCond.setText(imovel.getValorCondominio());
+        txtValorIptu.setText(imovel.getValorIptu());
+        taApresentacao.setText(imovel.getApresentacao());
+        taNegociacao.setText(imovel.getNegociacao());
+        cbxTipoImovel.setSelectedItem(imovel.getTipoImovel());
+        cbxTransacao.setSelectedItem(imovel.getTransacao());
+        cbxStatusImovel.setSelectedItem(imovel.getStatusImovel());
+        rbPatio.setSelected(Boolean.TRUE.equals(imovel.getPatio()));
+        rbVaranda.setSelected(Boolean.TRUE.equals(imovel.getVaranda()));
+        rbGradeado.setSelected(Boolean.TRUE.equals(imovel.getGradeado()));
+        rbMurado.setSelected(Boolean.TRUE.equals(imovel.getMurado()));
+        rbAlarme.setSelected(Boolean.TRUE.equals(imovel.getAlarme()));
+        rbQuiosqueCasa.setSelected(Boolean.TRUE.equals(imovel.getQuiosqueCasa()));
+        rbCanil.setSelected(Boolean.TRUE.equals(imovel.getCanil()));
+        rbPortao.setSelected(Boolean.TRUE.equals(imovel.getPortao()));
+        rbElevador.setSelected(Boolean.TRUE.equals(imovel.getElevador()));
+        rbPortaria.setSelected(Boolean.TRUE.equals(imovel.getPortaria()));
+        rbPorteiro.setSelected(Boolean.TRUE.equals(imovel.getPorteiro()));
+        rbPiscinaCond.setSelected(Boolean.TRUE.equals(imovel.getPiscinaCond()));
+        rbQuiosqueCond.setSelected(Boolean.TRUE.equals(imovel.getQuiosqueCond()));
+        rbPlayground.setSelected(Boolean.TRUE.equals(imovel.getPlayground()));
+        rbSalaoFestas.setSelected(Boolean.TRUE.equals(imovel.getSalaoFestas()));
+        rbBrinquedoteca.setSelected(Boolean.TRUE.equals(imovel.getBrinquedoteca()));
+        rbQuadraEsportes.setSelected(Boolean.TRUE.equals(imovel.getQuadraEsportes()));
+        rbchurrasqueira.setSelected(Boolean.TRUE.equals(imovel.getChurrasqueira()));
+        rbLavanderiaCon.setSelected(Boolean.TRUE.equals(imovel.getLavanderiaCond()));
+        rbAcademia.setSelected(Boolean.TRUE.equals(imovel.getAcademia()));
+        rbEspacoPet.setSelected(Boolean.TRUE.equals(imovel.getEspacoPet()));
+        rbCoworking.setSelected(Boolean.TRUE.equals(imovel.getCoworking()));
+        rbCamera.setSelected(Boolean.TRUE.equals(imovel.getCameras()));
+        rbPiscinaCasa.setSelected(Boolean.TRUE.equals(imovel.getPiscinaCasa()));
+        txtDorm.setText(imovel.getDormitorios() == null ? "" : imovel.getDormitorios().toString());
+        txtSl.setText(imovel.getSalas() == null ? "" : imovel.getSalas().toString());
+        txtBanh.setText(imovel.getBanheiros() == null ? "" : imovel.getBanheiros().toString());
+        txtSuite.setText(imovel.getSuites() == null ? "" : imovel.getSuites().toString());
+        txtLav.setText(imovel.getLavanderia() == null ? "" : imovel.getLavanderia().toString());
+        txtGar.setText(imovel.getVagasGaragem() == null ? "" : imovel.getVagasGaragem().toString());
+        txtSac.setText(imovel.getSacada() == null ? "" : imovel.getSacada().toString());
+        txtArTot.setText(imovel.getAreaTotal() == null ? "" : imovel.getAreaTotal().toString());
+        txtArPriv.setText(imovel.getAreaPrivativa() == null ? "" : imovel.getAreaPrivativa().toString());
+        txtArLt.setText(imovel.getAreaTerreno() == null ? "" : imovel.getAreaTerreno().toString());
+        alterado = false;
     }
 
-    private java.math.BigDecimal parseBigDecimal(String valor) {
-        try {
-            if (valor == null || valor.trim().isEmpty()) {
-                return null;
-            }
-            return new java.math.BigDecimal(valor.replace(",", ".").trim());
-        } catch (Exception e) {
-            return null;
+    private void abrirAnexos(boolean fotos) {
+        if (imovelEdicao == null) {
+            if (JOptionPane.showConfirmDialog(this, "É necessário salvar o imóvel antes de adicionar anexos. Salvar agora?", "Salvar imóvel", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION || !salvarAlteracoes()) return;
         }
+        try {
+            javax.swing.JFrame janela = fotos ? new FotosModal(imovelEdicao.getId()) : new DocumentosModal(imovelEdicao.getId());
+            janela.setLocationRelativeTo(this); janela.setVisible(true);
+        } catch (RuntimeException e) { JOptionPane.showMessageDialog(this, "Não foi possível abrir os anexos: " + e.getMessage()); }
+    }
+
+    private void configurarVisual() {
+
+        var dados = coluna(cartao("Informações do imóvel", coluna(
+            grade(3, campo("Tipo", cbxTipoImovel), campo("Status", cbxStatusImovel), campo("Responsável", txtResponsavel)),
+            grade(2, campo("Data de entrada", txtDtEntrada), campo("Validade do contrato", txtValidade)))),
+            cartao("Endereço", coluna(grade(2, campo("CEP", txtCep), campo("Endereço", txtEndereco)),
+                grade(3, campo("Número", txtNumero), campo("Complemento", txtComplemento), campo("Bairro", txtBairro)),
+                grade(2, campo("Cidade", txtCidade), campo("Estado", txtEstado)))),
+            cartao("Proprietário", grade(2, campo("Cliente vinculado", lblProprietario), acoes(btnNovoCliente))));
+        var caracteristicas = coluna(cartao("Ambientes e áreas", coluna(
+            grade(4, campo("Dormitórios", txtDorm), campo("Salas", txtSl), campo("Banheiros", txtBanh), campo("Suítes", txtSuite)),
+            grade(4, campo("Garagens", txtGar), campo("Identificação das garagens", txtIdGar), campo("Lavanderias", txtLav), campo("Sacadas", txtSac)),
+            grade(3, campo("Área privativa (m²)", txtArPriv), campo("Área total (m²)", txtArTot), campo("Área do lote (m²)", txtArLt)))),
+            cartao("Características externas", grade(3, rbPatio, rbGradeado, rbAlarme, rbPiscinaCasa, rbMurado, rbCanil, rbVaranda, rbQuiosqueCasa, rbPortao)),
+            cartao("Condomínio", grade(3, rbElevador, rbPlayground, rbchurrasqueira, rbQuadraEsportes, rbCoworking,
+                rbPortaria, rbPiscinaCond, rbSalaoFestas, rbAcademia, rbEspacoPet, rbPorteiro, rbQuiosqueCond, rbBrinquedoteca, rbLavanderiaCon, rbCamera)));
+        var valores = coluna(cartao("Negociação", coluna(grade(2, campo("Transação", cbxTransacao), campo("Valor (R$)", txtValor)),
+            grade(3, campo("Condomínio (R$)", txtValorCond), campo("IPTU — parcela (R$)", txtValorIptu), campo("Administradora", txtAdm)))),
+            cartao("Textos do imóvel", coluna(campo("Apresentação", texto(taApresentacao, 130)), campo("Negociação e detalhes financeiros", texto(taNegociacao, 100)))),
+            cartao("Fotos e documentos", acoes(bntAddFotos, btnAddDocs)));
+        javax.swing.JTabbedPane abas = new javax.swing.JTabbedPane();
+        abas.addTab("Dados e endereço", rolar(dados));
+        abas.addTab("Características", rolar(caracteristicas));
+        abas.addTab("Valores e anexos", rolar(valores));
+        pagina(this, panelMenu, "Cadastro de imóvel", "Organize os dados, as características e a negociação do imóvel.", abas, acoes(btnCancelarImovel, btnSalvarImovel));
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

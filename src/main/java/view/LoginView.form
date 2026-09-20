@@ -179,6 +179,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Esqueceu sua senha?"/>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblNovaSenhaMouseClicked"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="lblLogo">
               <Properties>

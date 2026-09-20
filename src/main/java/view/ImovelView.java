@@ -1,11 +1,14 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import dao.ImovelDao;
 import util.Navegador;
 
 import java.awt.Color;
 import javax.swing.JOptionPane;
 import model.ImovelModel;
+import util.SessaoUsuario;
 
 /**
  *
@@ -22,12 +25,23 @@ public class ImovelView extends javax.swing.JFrame {
      * Creates new form ListaImovelView
      */
     public ImovelView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
+        bloquearCampos();
+        lblUsuarios.setVisible(SessaoUsuario.isAdministrador());
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
         bloquearCampos();
     }
 
     public ImovelView(ImovelModel imovel) {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
+        bloquearCampos();
+        lblUsuarios.setVisible(SessaoUsuario.isAdministrador());
         preencherFormulario(imovel);
     }
 
@@ -502,7 +516,7 @@ public class ImovelView extends javax.swing.JFrame {
     private void btnEditarImovelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarImovelActionPerformed
         Navegador.abrirTela(
                 this,
-                new NovoImovelView(),
+                new NovoImovelView(imovelAtual),
                 alterado
         );
     }//GEN-LAST:event_btnEditarImovelActionPerformed
@@ -521,7 +535,7 @@ public class ImovelView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnContatoProprietarioActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        // TODO add your handling code here:
+        Navegador.abrirTela(this, new ListaUsuarioModal(), alterado);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     /**
@@ -600,9 +614,37 @@ public class ImovelView extends javax.swing.JFrame {
         );
 
         taDescricao.setText(imovel.getApresentacao());
+        lblCodigo.setText(String.valueOf(imovel.getId()));
+        lblTitulo.setText(imovel.getTipoImovel() + " - " + imovel.getCidade());
+        java.util.List<model.FotoModel> fotos = new dao.FotoDao().listar(imovel.getId());
+        if (!fotos.isEmpty()) lblFotoPrincipal.setText("");
+        if (!fotos.isEmpty()) lblFotoPrincipal.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(fotos.get(0).getConteudo()).getImage().getScaledInstance(330,220,java.awt.Image.SCALE_SMOOTH)));
+        lblFotoPrincipal.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        lblFotoPrincipal.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent e) { new FotosModal(imovel.getId()).setVisible(true); }
+        });
     }
-    
-    
+
+
+    private void configurarVisual() {
+        lblFotoPrincipal.setPreferredSize(new java.awt.Dimension(330, 220));
+        lblFotoPrincipal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblFotoPrincipal.setOpaque(true); lblFotoPrincipal.setBackground(util.Tema.FUNDO);
+        lblFotoPrincipal.setText("Clique para ver as fotos");
+        pagina(this, panelMenu, "Detalhes do imóvel", "Consulte as informações e acesse o cadastro completo para editar.", coluna(
+            cartao("Visão geral", coluna(lblTitulo, grade(2, lblFotoPrincipal, coluna(campo("Código", lblCodigo),
+                campo("Valor (R$)", txtValorImovel), grade(2, campo("Condomínio (R$)", txtValorCondImovel), campo("IPTU — parcela (R$)", txtValorIptuImovel)))))),
+            cartao("Localização e características", coluna(campo("Endereço", txtEnderecoImovel), grade(4,
+                campo("Dormitórios", txtDormitoriosImovel), campo("Banheiros", txtBanheirosImovel), campo("Garagens", txtGaragensImovel), campo("Área privativa (m²)", txtMetragemImovel)),
+                grade(2, campo("Responsável", txtResponsavelImovel), acoes(btnContatoProprietario)))),
+            cartao("Apresentação", texto(taDescricao, 130))), acoes(btnVoltar, btnEditarImovel));
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnContatoProprietario;

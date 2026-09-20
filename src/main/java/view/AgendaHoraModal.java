@@ -4,6 +4,8 @@
  */
 package view;
 
+import static util.LayoutTela.*;
+
 import util.Navegador;
 
 /**
@@ -13,6 +15,8 @@ import util.Navegador;
 public class AgendaHoraModal extends javax.swing.JFrame {
 
     private boolean alterado = false;
+    private java.time.LocalDate data = java.time.LocalDate.now();
+    private model.AgendaModel tarefaEdicao;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(AgendaHoraModal.class.getName());
 
@@ -20,7 +24,10 @@ public class AgendaHoraModal extends javax.swing.JFrame {
      * Creates new form AgendaModal
      */
     public AgendaHoraModal() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     }
 
     /**
@@ -118,11 +125,21 @@ public class AgendaHoraModal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnAgendarTarefaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgendarTarefaActionPerformed
-        Navegador.abrirTela(this, new AgendaModal(), alterado);        // TODO add your handling code here:
+        try {
+            model.AgendaModel tarefa = new model.AgendaModel();
+            if (tarefaEdicao != null) { tarefa.setId(tarefaEdicao.getId()); tarefa.setConcluida(tarefaEdicao.isConcluida()); }
+            tarefa.setData(data);
+            try { tarefa.setHorario(java.time.LocalTime.parse(jTextField2.getText().trim())); }
+            catch (java.time.format.DateTimeParseException e) { throw new IllegalArgumentException("Informe o horário no formato HH:mm, por exemplo 09:30."); }
+            tarefa.setTipo(jComboBox1.getSelectedItem().toString());
+            tarefa.setDescricao(jTextArea1.getText());
+            new controller.AgendaController().salvar(tarefa);
+            dispose();
+        } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Não foi possível agendar", javax.swing.JOptionPane.ERROR_MESSAGE); }
     }//GEN-LAST:event_btnAgendarTarefaActionPerformed
 
     /**
@@ -148,6 +165,33 @@ public class AgendaHoraModal extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new AgendaHoraModal().setVisible(true));
+    }
+
+
+    public AgendaHoraModal(java.time.LocalDate data, model.AgendaModel tarefa) {
+        this(); this.data = data; this.tarefaEdicao = tarefa;
+        lblDataAgenda.setText(data.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        jTextField2.setToolTipText("HH:mm, por exemplo 09:30");
+        if (tarefa != null) {
+            jTextField2.setText(tarefa.getHorario().toString());
+            jComboBox1.setSelectedItem(tarefa.getTipo());
+            jTextArea1.setText(tarefa.getDescricao());
+            btnAgendarTarefa.setText("Salvar tarefa");
+        }
+    }
+
+    private void configurarVisual() {
+
+        jTextField2.putClientProperty("JTextField.placeholderText", "09:30");
+        modal(this, "Agendamento", "Organize os compromissos da sua agenda.", cartao("Detalhes", coluna(
+                campo("Data selecionada", lblDataAgenda), grade(2, campo("Horário (hh:mm)", jTextField2), campo("Tipo", jComboBox1)),
+                campo("Descrição", texto(jTextArea1, 110)))), acoes(btnCancelar, btnAgendarTarefa), 660, 620);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

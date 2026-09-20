@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import util.Navegador;
 import dao.ClienteDao;
 import model.ClientePfModel;
@@ -22,7 +24,10 @@ public class NovoClienteModal extends javax.swing.JFrame {
      * Creates new form NovoClienteModal
      */
     public NovoClienteModal() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
+        util.MascaraData.aplicar(txtNascimento);
         jPanel1.setVisible(false);
         jPanel3.setVisible(false);
         jPanel2.setVisible(false);
@@ -32,7 +37,10 @@ public class NovoClienteModal extends javax.swing.JFrame {
 
     public NovoClienteModal(ClienteModel cliente) {
 
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
+        util.MascaraData.aplicar(txtNascimento);
 
         jPanel1.setVisible(false);
         jPanel3.setVisible(false);
@@ -43,6 +51,7 @@ public class NovoClienteModal extends javax.swing.JFrame {
         this.clienteEdicao = cliente;
 
         carregarDados();
+        cbxTipoCliente.setEnabled(false);
 
     }
 
@@ -393,100 +402,43 @@ public class NovoClienteModal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
-        if (clienteEdicao != null) {
-
-            atualizarCliente();
-
-            javax.swing.JOptionPane.showMessageDialog(
-                    this,
-                    "Cliente atualizado com sucesso!"
-            );
-
-            dispose();
-
-            return;
-        }
-
-        ClienteDao dao = new ClienteDao();
-
+        logger.info("Cliente: solicitação de salvamento recebida.");
         try {
-
-            if (cbxTipoCliente.getSelectedIndex() == 0) {
-
-                javax.swing.JOptionPane.showMessageDialog(
-                        this,
-                        "Selecione o tipo de cliente."
-                );
-
-                return;
-
-            } else if (cbxTipoCliente.getSelectedIndex() == 1) {
-
-                ClientePfModel cliente = new ClientePfModel();
-
-                cliente.setNome(txtNome.getText());
-                cliente.setCpf(txtCpf.getText());
-                cliente.setRg(txtRg.getText());
-
-                cliente.setDataNascimento(
-                        LocalDate.parse(txtNascimento.getText())
-                );
-                cliente.setTelefone(txtTelefone.getText());
-                cliente.setEmail(txtEmail.getText());
-
-                cliente.setCep(txtCep.getText());
-                cliente.setRua(txtRua.getText());
-                cliente.setNumero(txtNumero.getText());
-                cliente.setComplemento(txtComplemento.getText());
-                cliente.setBairro(txtBairro.getText());
-                cliente.setCidade(txtCidade.getText());
-                cliente.setEstado(cbxEstado.getSelectedItem().toString());
-
-                dao.salvar(cliente);
-
-            } else if (cbxTipoCliente.getSelectedIndex() == 2) {
-
-                ClientePjModel cliente = new ClientePjModel();
-
-                cliente.setRazaoSocial(TxtRazaoSocial.getText());
-                cliente.setCnpj(txtCnpj.getText());
-                cliente.setInscricaoEstadual(txtInscEstadual.getText());
-                cliente.setNomeResponsavel(txtNomeResponsavel.getText());
-
-                cliente.setTelefone(txtTelefone.getText());
-                cliente.setEmail(txtEmail.getText());
-
-                cliente.setCep(txtCep.getText());
-                cliente.setRua(txtRua.getText());
-                cliente.setNumero(txtNumero.getText());
-                cliente.setComplemento(txtComplemento.getText());
-                cliente.setBairro(txtBairro.getText());
-                cliente.setCidade(txtCidade.getText());
-                cliente.setEstado(cbxEstado.getSelectedItem().toString());
-
-                dao.salvar(cliente);
-
+            if (cbxTipoCliente.getSelectedIndex() == 0) throw new IllegalArgumentException("Selecione o tipo de cliente.");
+            ClienteModel cliente = clienteEdicao == null
+                    ? (cbxTipoCliente.getSelectedIndex() == 1 ? new ClientePfModel() : new ClientePjModel())
+                    : clienteEdicao;
+            if (cliente instanceof ClientePfModel pf) {
+                pf.setNome(txtNome.getText());
+                pf.setCpf(txtCpf.getText());
+                pf.setRg(txtRg.getText());
+                pf.setDataNascimento(util.Validador.data(txtNascimento.getText(), "o nascimento"));
+            } else if (cliente instanceof ClientePjModel pj) {
+                pj.setRazaoSocial(TxtRazaoSocial.getText());
+                pj.setCnpj(txtCnpj.getText());
+                pj.setInscricaoEstadual(txtInscEstadual.getText());
+                pj.setNomeResponsavel(txtNomeResponsavel.getText());
             }
-
-            javax.swing.JOptionPane.showMessageDialog(
-                    this,
-                    "Cliente cadastrado com sucesso!"
-            );
-
+            cliente.setTelefone(txtTelefone.getText().trim());
+            cliente.setEmail(txtEmail.getText());
+            cliente.setCep(txtCep.getText());
+            cliente.setRua(txtRua.getText());
+            cliente.setNumero(txtNumero.getText());
+            cliente.setComplemento(txtComplemento.getText());
+            cliente.setBairro(txtBairro.getText());
+            cliente.setCidade(txtCidade.getText());
+            cliente.setEstado(cbxEstado.getSelectedItem().toString());
+            new controller.ClienteController().salvar(cliente);
+            logger.log(java.util.logging.Level.INFO, "Cliente: salvamento confirmado, código {0}.", cliente.getId());
+            javax.swing.JOptionPane.showMessageDialog(this, "Cliente salvo com sucesso! Código: " + cliente.getId());
             dispose();
-
-        } catch (Exception e) {
-
-            javax.swing.JOptionPane.showMessageDialog(
-                    this,
-                    "Erro ao salvar cliente:\n" + e.getMessage()
-            );
-
-            e.printStackTrace();
-
+        } catch (IllegalArgumentException e) {
+            logger.log(java.util.logging.Level.INFO, "Cliente: validação impediu o salvamento: {0}", e.getMessage());
+            javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Confira os dados", javax.swing.JOptionPane.WARNING_MESSAGE);
+        } catch (RuntimeException e) {
+            logger.log(java.util.logging.Level.SEVERE, "Cliente: falha no salvamento; formulário mantido aberto.", e);
+            javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível salvar o cliente. Os dados continuam nesta tela.\n" + e.getMessage(), "Não foi possível salvar", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
-
-
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     private void cbxTipoClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxTipoClienteActionPerformed
@@ -535,58 +487,19 @@ public class NovoClienteModal extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> new NovoClienteModal().setVisible(true));
     }
 
-    private void atualizarCliente() {
-
-        ClienteDao dao = new ClienteDao();
-
-        if (clienteEdicao instanceof ClientePfModel pf) {
-
-            pf.setNome(txtNome.getText());
-            pf.setCpf(txtCpf.getText());
-            pf.setRg(txtRg.getText());
-
-            pf.setTelefone(txtTelefone.getText());
-            pf.setEmail(txtEmail.getText());
-
-            pf.setCep(txtCep.getText());
-            pf.setRua(txtRua.getText());
-            pf.setNumero(txtNumero.getText());
-            pf.setComplemento(txtComplemento.getText());
-            pf.setBairro(txtBairro.getText());
-            pf.setCidade(txtCidade.getText());
-            pf.setEstado(cbxEstado.getSelectedItem().toString());
-
-            dao.atualizar(pf);
-        }
-
-        if (clienteEdicao instanceof ClientePjModel pj) {
-
-            pj.setRazaoSocial(TxtRazaoSocial.getText());
-            pj.setCnpj(txtCnpj.getText());
-            pj.setInscricaoEstadual(txtInscEstadual.getText());
-            pj.setNomeResponsavel(txtNomeResponsavel.getText());
-
-            pj.setTelefone(txtTelefone.getText());
-            pj.setEmail(txtEmail.getText());
-
-            pj.setCep(txtCep.getText());
-            pj.setRua(txtRua.getText());
-            pj.setNumero(txtNumero.getText());
-            pj.setComplemento(txtComplemento.getText());
-            pj.setBairro(txtBairro.getText());
-            pj.setCidade(txtCidade.getText());
-            pj.setEstado(cbxEstado.getSelectedItem().toString());
-
-            dao.atualizar(pj);
-        }
-    }
-
     private void carregarDados() {
 
         if (clienteEdicao == null) {
             return;
         }
 
+        txtCep.setText(clienteEdicao.getCep());
+        txtRua.setText(clienteEdicao.getRua());
+        txtNumero.setText(clienteEdicao.getNumero());
+        txtComplemento.setText(clienteEdicao.getComplemento());
+        txtBairro.setText(clienteEdicao.getBairro());
+        txtCidade.setText(clienteEdicao.getCidade());
+        cbxEstado.setSelectedItem(clienteEdicao.getEstado());
         if (clienteEdicao instanceof ClientePfModel pf) {
 
             cbxTipoCliente.setSelectedItem("Pessoa Física");
@@ -594,6 +507,7 @@ public class NovoClienteModal extends javax.swing.JFrame {
             txtNome.setText(pf.getNome());
             txtCpf.setText(pf.getCpf());
             txtRg.setText(pf.getRg());
+            txtNascimento.setText(pf.getDataNascimento() == null ? "" : pf.getDataNascimento().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
             txtTelefone.setText(pf.getTelefone());
             txtEmail.setText(pf.getEmail());
@@ -632,6 +546,30 @@ public class NovoClienteModal extends javax.swing.JFrame {
                 break;
         }
 
+    }
+
+    private void configurarVisual() {
+
+        jPanel1.setPreferredSize(null); jPanel2.setPreferredSize(null); jPanel3.setPreferredSize(null);
+        jPanel1.removeAll(); jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.add(cartao("Dados pessoais", coluna(campo("Nome completo", txtNome), grade(3,
+                campo("CPF", txtCpf), campo("RG", txtRg), campo("Nascimento", txtNascimento)))));
+        jPanel3.removeAll(); jPanel3.setLayout(new java.awt.BorderLayout());
+        jPanel3.add(cartao("Dados da empresa", coluna(campo("Razão social", TxtRazaoSocial), grade(2,
+                campo("CNPJ", txtCnpj), campo("Inscrição estadual", txtInscEstadual)), campo("Responsável", txtNomeResponsavel))));
+        jPanel2.removeAll(); jPanel2.setLayout(new java.awt.BorderLayout());
+        jPanel2.add(coluna(cartao("Endereço", coluna(grade(2, campo("CEP", txtCep), campo("Rua", txtRua)),
+                grade(2, campo("Número", txtNumero), campo("Complemento", txtComplemento)),
+                grade(3, campo("Bairro", txtBairro), campo("Cidade", txtCidade), campo("Estado", cbxEstado)))),
+                cartao("Contato", grade(2, campo("Telefone", txtTelefone), campo("E-mail", txtEmail)))));
+        modal(this, "Cadastro de cliente", "Dados pessoais ou da empresa, endereço e contato.",
+                coluna(campo("Tipo de cliente", cbxTipoCliente), jPanel1, jPanel3, jPanel2), acoes(btnCancelar, btnSalvar), 780, 840);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

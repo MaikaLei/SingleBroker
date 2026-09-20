@@ -26,7 +26,7 @@ public class ImovelDao {
 
         } catch (Exception e) {
 
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
 
             throw e;
 
@@ -89,7 +89,7 @@ public class ImovelDao {
 
         } catch (Exception e) {
 
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
 
             throw e;
 

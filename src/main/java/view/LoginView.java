@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import dao.UsuarioDao;
 import javax.swing.JOptionPane;
 import model.UsuarioModel;
@@ -17,7 +19,9 @@ public class LoginView extends javax.swing.JFrame {
      * Creates new form LoginView
      */
     public LoginView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
     }
 
     /**
@@ -67,6 +71,11 @@ public class LoginView extends javax.swing.JFrame {
         });
 
         lblNovaSenha.setText("Esqueceu sua senha?");
+        lblNovaSenha.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblNovaSenhaMouseClicked(evt);
+            }
+        });
 
         lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/logo120x120.png"))); // NOI18N
 
@@ -146,41 +155,43 @@ public class LoginView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntrarActionPerformed
+        btnEntrar.setEnabled(false);
         String email = txtEmail.getText().trim();
-
         String senha = new String(txtSenha.getPassword());
-
-        UsuarioDao dao = new UsuarioDao();
-
-        UsuarioModel usuario = dao.autenticar(email, senha);
-
-        if (usuario != null) {
-
-            SessaoUsuario.setUsuarioLogado(usuario);
-
-            JOptionPane.showMessageDialog(this,
-                    "Bem-vindo, " + usuario.getNome());
-
-            new ListaImovelView().setVisible(true);
-
-            dispose();
-
-        } else {
-
-            JOptionPane.showMessageDialog(this,
-                    "Email ou senha inválidos!");
-
-        }
-
+        new javax.swing.SwingWorker<UsuarioModel, Void>() {
+            protected UsuarioModel doInBackground() { return new controller.LoginController().entrar(email, senha); }
+            protected void done() {
+                try {
+                    UsuarioModel usuario = get();
+                    if (usuario == null) { JOptionPane.showMessageDialog(LoginView.this, "E-mail ou senha inválidos."); return; }
+                    new ListaImovelView().setVisible(true);
+                    dispose();
+                } catch (Exception e) {
+                    Throwable causa = e.getCause() == null ? e : e.getCause();
+                    JOptionPane.showMessageDialog(LoginView.this, causa.getMessage(), "Não foi possível entrar", JOptionPane.ERROR_MESSAGE);
+                } finally { btnEntrar.setEnabled(true); txtSenha.setText(""); }
+            }
+        }.execute();
     }//GEN-LAST:event_btnEntrarActionPerformed
+
+    private void lblNovaSenhaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblNovaSenhaMouseClicked
+        JOptionPane.showMessageDialog(
+                this,
+                """
+    Para redefinição de senha,
+    entre em contato com o administrador.
+
+    Email: admin@imobiliaria.com
+    Telefone: (51) 99999-9999
+    """
+        );
+    }//GEN-LAST:event_lblNovaSenhaMouseClicked
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> {
-            new LoginView().setVisible(true);
-        });
+
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -200,6 +211,23 @@ public class LoginView extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new LoginView().setVisible(true));
+    }
+
+    private void configurarVisual() {
+
+        txtEmail.putClientProperty("JTextField.placeholderText", "seu@email.com");
+        txtSenha.putClientProperty("JTextField.placeholderText", "Sua senha");
+        lblNovaSenha.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        var formulario = coluna(lblLogo, campo("E-mail", txtEmail), campo("Senha", txtSenha), acoes(btnEntrar), lblNovaSenha);
+        modal(this, "Bem-vindo ao SingleBroker", "Entre para gerenciar seus imóveis e clientes.", cartao("Acessar sua conta", formulario), null, 520, 660);
+        getRootPane().setDefaultButton(btnEntrar);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

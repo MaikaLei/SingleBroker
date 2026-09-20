@@ -1,40 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package util;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
-/**
- *
- * @author Maikon
- */
-public class Navegador {
-
-    public static void abrirTela(
-            JFrame telaAtual,
-            JFrame novaTela,
-            boolean alterado
-    ) {
-
-        if (alterado) {
-
-            int opcao = JOptionPane.showConfirmDialog(
-                    telaAtual,
-                    "Você alterou os dados. Deseja salvar?",
-                    "Confirmação",
-                    JOptionPane.YES_NO_CANCEL_OPTION
-            );
-
-            if (opcao == JOptionPane.CANCEL_OPTION) {
-                return;
-            }
+public final class Navegador {
+    private Navegador() { }
+    public static boolean podeSair(JFrame tela, boolean alterado) {
+        boolean mudou = tela instanceof FormularioEditavel f ? f.temAlteracoes() : alterado;
+        if (!mudou) return true;
+        if (tela instanceof FormularioEditavel f) {
+            int resposta = JOptionPane.showConfirmDialog(tela, "Deseja salvar as alterações antes de sair?", "Alterações não salvas", JOptionPane.YES_NO_CANCEL_OPTION);
+            if (resposta == JOptionPane.YES_OPTION) return f.salvarAlteracoes();
+            return resposta == JOptionPane.NO_OPTION;
         }
-
-        novaTela.setVisible(true);
-        telaAtual.dispose();
+        return JOptionPane.showConfirmDialog(tela, "Descartar as alterações e sair?", "Alterações não salvas", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
     }
-
+    public static void abrirTela(JFrame atual, JFrame proxima, boolean alterado) {
+        if (!podeSair(atual, alterado)) { proxima.dispose(); return; }
+        proxima.setVisible(true);
+        atual.dispose();
+    }
 }

@@ -1,9 +1,11 @@
-
 package view;
+
+import static util.LayoutTela.*;
 
 import util.Navegador;
 
 import java.awt.Color;
+import util.SessaoUsuario;
 
 /**
  *
@@ -12,6 +14,7 @@ import java.awt.Color;
 public class CriativosView extends javax.swing.JFrame {
 
     private boolean alterado = false;
+    private java.util.List<model.ImovelModel> imoveis;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CriativosView.class.getName());
 
@@ -19,7 +22,32 @@ public class CriativosView extends javax.swing.JFrame {
      * Creates new form ListaImovelView
      */
     public CriativosView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
+        btnCopiar.setFont(btnCopiar.getFont().deriveFont(12f));
+        btnCopiar.setMargin(new java.awt.Insets(3, 6, 3, 6));
+        cbxImovel.addActionListener(e -> cbxImovel.setToolTipText(java.util.Objects.toString(cbxImovel.getSelectedItem(), "")));
+        imoveis = new dao.ImovelDao().listar();
+        for (model.ImovelModel i : imoveis) cbxImovel.addItem(i.getId() + " - " + i.getTipoImovel() + " - " + i.getCidade());
+        taCriativo.setLineWrap(true); taCriativo.setWrapStyleWord(true);
+        btnGerar.addActionListener(e -> {
+            int indice=cbxImovel.getSelectedIndex();
+            if (indice<0) { javax.swing.JOptionPane.showMessageDialog(this,"Cadastre um imóvel primeiro."); return; }
+            taCriativo.setText(new controller.CriativoController().gerar(imoveis.get(indice),cbxTipo.getSelectedItem().toString()));
+        });
+        btnCopiar.addActionListener(e -> {
+            if (taCriativo.getText().isBlank()) return;
+            java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new java.awt.datatransfer.StringSelection(taCriativo.getText()),null);
+            javax.swing.JOptionPane.showMessageDialog(this,"Texto copiado.");
+        });
+        btnExportar.addActionListener(e -> {
+            if (taCriativo.getText().isBlank()) { javax.swing.JOptionPane.showMessageDialog(this,"Gere um texto antes de exportar."); return; }
+            util.ExportadorPdf.escolherESalvar(this,"Apresentação do imóvel",taCriativo.getText());
+        });
+        lblUsuarios.setVisible(
+                SessaoUsuario.isAdministrador()
+        );
     }
 
     /**
@@ -311,7 +339,7 @@ public class CriativosView extends javax.swing.JFrame {
     }//GEN-LAST:event_cbxImovelActionPerformed
 
     private void lblUsuariosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblUsuariosMouseClicked
-        // TODO add your handling code here:
+        Navegador.abrirTela(this, new ListaUsuarioModal(), alterado);
     }//GEN-LAST:event_lblUsuariosMouseClicked
 
     /**
@@ -337,6 +365,20 @@ public class CriativosView extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new CriativosView().setVisible(true));
+    }
+
+    private void configurarVisual() {
+
+        taCriativo.putClientProperty("JTextArea.placeholderText", "Selecione um imóvel e clique em Gerar criativo.");
+        pagina(this, panelMenu, "Criativos", "Prepare textos para divulgar seus imóveis.", listagem(
+                cartao("Criar conteúdo", coluna(grade(2, campo("Tipo de texto", cbxTipo), campo("Imóvel", cbxImovel)), acoes(btnGerar))),
+                cartao("Texto do anúncio", texto(taCriativo, 290))), acoes(btnCopiar, btnExportar));
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
