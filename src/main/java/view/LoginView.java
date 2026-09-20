@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import dao.UsuarioDao;
 import javax.swing.JOptionPane;
 import model.UsuarioModel;
@@ -17,7 +19,9 @@ public class LoginView extends javax.swing.JFrame {
      * Creates new form LoginView
      */
     public LoginView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
     }
 
     /**
@@ -207,6 +211,23 @@ public class LoginView extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new LoginView().setVisible(true));
+    }
+
+    private void configurarVisual() {
+
+        txtEmail.putClientProperty("JTextField.placeholderText", "seu@email.com");
+        txtSenha.putClientProperty("JTextField.placeholderText", "Sua senha");
+        lblNovaSenha.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        var formulario = coluna(lblLogo, campo("E-mail", txtEmail), campo("Senha", txtSenha), acoes(btnEntrar), lblNovaSenha);
+        modal(this, "Bem-vindo ao SingleBroker", "Entre para gerenciar seus imóveis e clientes.", cartao("Acessar sua conta", formulario), null, 520, 660);
+        getRootPane().setDefaultButton(btnEntrar);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -4,6 +4,8 @@
  */
 package view;
 
+import static util.LayoutTela.*;
+
 import util.Navegador;
 
 import java.awt.Color;
@@ -24,7 +26,9 @@ public class MinhaPaginaView extends javax.swing.JFrame implements util.Formular
      * Creates new form ListaImovelView
      */
     public MinhaPaginaView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
         carregarPagina();
         util.AlteracoesFormulario.observar(getContentPane(), () -> alterado = true);
         lblMudarFoto.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
@@ -466,6 +470,7 @@ public class MinhaPaginaView extends javax.swing.JFrame implements util.Formular
         atualizarFoto();
     }
     private void atualizarFoto() {
+        lblFotoPerfil.setText(pagina.getFoto() == null ? "Sua foto" : "");
         if (pagina.getFoto() != null) lblFotoPerfil.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(pagina.getFoto()).getImage().getScaledInstance(130, 130, java.awt.Image.SCALE_SMOOTH)));
     }
     private void escolherFoto() {
@@ -483,6 +488,26 @@ public class MinhaPaginaView extends javax.swing.JFrame implements util.Formular
             pagina.setEmail(txtEmail.getText()); pagina.setInstagram(txtInstagram.getText());
             new controller.MinhaPaginaController().salvar(pagina); alterado=false; return true;
         } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this,e.getMessage()); return false; }
+    }
+
+    private void configurarVisual() {
+
+        lblFotoPerfil.setPreferredSize(new java.awt.Dimension(140, 140));
+        lblFotoPerfil.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        if (lblFotoPerfil.getIcon() == null) lblFotoPerfil.setText("Sua foto");
+        lblMudarFoto.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        pagina(this, panelMenu, "Minha página", "Mantenha sua apresentação e seus contatos atualizados.", coluna(
+                cartao("Perfil", grade(2, coluna(lblFotoPerfil, lblMudarFoto), coluna(lblNomeUsuario, campo("Perfil de acesso", lblCargo),
+                    campo("Título profissional", texto(taTitulo1, 58))))),
+                cartao("Contato", grade(3, campo("Telefone", txtTelefone), campo("E-mail", txtEmail), campo("Instagram", txtInstagram))),
+                cartao("Apresentação", coluna(campo("Breve descrição", texto(taDescricao1, 92)), campo("Biografia", texto(taBibliografia, 130))))),
+                acoes(btnCancelar, btnNovoImovel));
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

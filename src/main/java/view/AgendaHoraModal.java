@@ -4,6 +4,8 @@
  */
 package view;
 
+import static util.LayoutTela.*;
+
 import util.Navegador;
 
 /**
@@ -22,7 +24,9 @@ public class AgendaHoraModal extends javax.swing.JFrame {
      * Creates new form AgendaModal
      */
     public AgendaHoraModal() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     }
 
@@ -174,6 +178,20 @@ public class AgendaHoraModal extends javax.swing.JFrame {
             jTextArea1.setText(tarefa.getDescricao());
             btnAgendarTarefa.setText("Salvar tarefa");
         }
+    }
+
+    private void configurarVisual() {
+
+        jTextField2.putClientProperty("JTextField.placeholderText", "09:30");
+        modal(this, "Agendamento", "Organize os compromissos da sua agenda.", cartao("Detalhes", coluna(
+                campo("Data selecionada", lblDataAgenda), grade(2, campo("Horário (hh:mm)", jTextField2), campo("Tipo", jComboBox1)),
+                campo("Descrição", texto(jTextArea1, 110)))), acoes(btnCancelar, btnAgendarTarefa), 660, 620);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

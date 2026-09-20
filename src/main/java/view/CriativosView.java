@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import util.Navegador;
 
 import java.awt.Color;
@@ -20,7 +22,9 @@ public class CriativosView extends javax.swing.JFrame {
      * Creates new form ListaImovelView
      */
     public CriativosView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
         btnCopiar.setFont(btnCopiar.getFont().deriveFont(12f));
         btnCopiar.setMargin(new java.awt.Insets(3, 6, 3, 6));
         cbxImovel.addActionListener(e -> cbxImovel.setToolTipText(java.util.Objects.toString(cbxImovel.getSelectedItem(), "")));
@@ -361,6 +365,20 @@ public class CriativosView extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new CriativosView().setVisible(true));
+    }
+
+    private void configurarVisual() {
+
+        taCriativo.putClientProperty("JTextArea.placeholderText", "Selecione um imóvel e clique em Gerar criativo.");
+        pagina(this, panelMenu, "Criativos", "Prepare textos para divulgar seus imóveis.", listagem(
+                cartao("Criar conteúdo", coluna(grade(2, campo("Tipo de texto", cbxTipo), campo("Imóvel", cbxImovel)), acoes(btnGerar))),
+                cartao("Texto do anúncio", texto(taCriativo, 290))), acoes(btnCopiar, btnExportar));
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

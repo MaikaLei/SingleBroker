@@ -4,6 +4,8 @@
  */
 package view;
 
+import static util.LayoutTela.*;
+
 import util.Navegador;
 
 import java.awt.Color;
@@ -23,7 +25,9 @@ public class AgendaView extends javax.swing.JFrame {
      * Creates new form ListaImovelView
      */
     public AgendaView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
         int ano = java.time.LocalDate.now().getYear();
         cbxAno.removeAllItems();
         for (int a = ano - 10; a <= ano + 10; a++) cbxAno.addItem(String.valueOf(a));
@@ -1008,6 +1012,7 @@ public class AgendaView extends javax.swing.JFrame {
             botoes[i].setEnabled(valido);
             long total = valido ? totais.getOrDefault(data, 0L) : 0;
             botoes[i].setText(valido ? String.valueOf(dia) + (total > 0 ? " (" + total + ")" : "") : "");
+            util.Tema.dia(botoes[i]);
             botoes[i].setToolTipText(valido ? total + " tarefa(s) pendente(s)" : null);
         }
     }
@@ -1019,6 +1024,26 @@ public class AgendaView extends javax.swing.JFrame {
             public void windowClosed(java.awt.event.WindowEvent e) { atualizarCalendario(); }
         });
         janela.setVisible(true);
+    }
+
+    private void configurarVisual() {
+
+        javax.swing.JPanel dias = painel(new java.awt.GridLayout(0, 7, 8, 6));
+        javax.swing.JPanel semana = painel(new java.awt.GridLayout(1, 7, 8, 0));
+        for (String dia : new String[]{"Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"}) {
+            var rotulo = titulo(dia, 13); rotulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER); semana.add(rotulo);
+        }
+        javax.swing.JButton[] botoes = new javax.swing.JButton[]{btnGrid1, btnGrid2, btnGrid3, btnGrid4, btnGrid5, btnGrid6, btnGrid7, btnGrid8, btnGrid9, btnGrid10, btnGrid11, btnGrid12, btnGrid13, btnGrid14, btnGrid15, btnGrid16, btnGrid17, btnGrid18, btnGrid19, btnGrid20, btnGrid21, btnGrid22, btnGrid23, btnGrid24, btnGrid25, btnGrid26, btnGrid27, btnGrid28, btnGrid29, btnGrid30, btnGrid31, btnGrid32, btnGrid33, btnGrid34, btnGrid35, btnGrid36, btnGrid37, btnGrid38, btnGrid39, btnGrid40, btnGrid41, btnGrid42};
+        for (javax.swing.JButton botao : botoes) { botao.setPreferredSize(new java.awt.Dimension(90, 38)); dias.add(botao); }
+        pagina(this, panelMenu, "Minha agenda", "Clique em um dia para consultar, criar ou excluir agendamentos.",
+            cartao("", coluna(grade(2, campo("Mês", cbxMes), campo("Ano", cbxAno)), semana, dias,
+                titulo("O dia atual aparece em azul. Os números entre parênteses indicam tarefas pendentes.", 13))), null);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

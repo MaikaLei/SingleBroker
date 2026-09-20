@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import java.awt.Color;
 import util.Navegador;
 import dao.ClienteDao;
@@ -26,7 +28,9 @@ public class SelecionarClienteView extends javax.swing.JFrame {
      * Creates new form ListaImovelView
      */
     public SelecionarClienteView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
         tblCliente.setDefaultEditor(Object.class, null);
         configurarDuploClique();
         carregarTabela();
@@ -430,7 +434,9 @@ public class SelecionarClienteView extends javax.swing.JFrame {
 
     public SelecionarClienteView(NovoImovelView telaOrigem) {
 
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
 
         this.telaOrigem = telaOrigem;
 
@@ -564,6 +570,20 @@ public class SelecionarClienteView extends javax.swing.JFrame {
             }
         }
 
+    }
+
+    private void configurarVisual() {
+
+        jScrollPane2.setPreferredSize(new java.awt.Dimension(800, 320));
+        modal(this, "Selecionar proprietário", "Dê dois cliques no cliente que será vinculado ao imóvel.", listagem(
+                cartao("Buscar cliente", coluna(grade(4, campo("Tipo", cbxTipoCliente), campo("CPF / CNPJ", txtCpfCnpj), campo("Nome", txtNomeCliente), campo("Telefone", txtTelefone)), acoes(btnbuscarCliente))),
+                jScrollPane2), acoes(btnNovoCliente), 1000, 690);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

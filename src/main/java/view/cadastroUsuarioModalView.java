@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import dao.UsuarioDao;
 import enums.PerfilUsuario;
 import java.time.LocalDateTime;
@@ -22,7 +24,9 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
      * Creates new form NovoClienteModal
      */
     public cadastroUsuarioModalView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
     }
 
     /**
@@ -226,7 +230,9 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
 
     public cadastroUsuarioModalView(UsuarioModel usuario) {
 
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
 
         this.usuarioEdicao = usuario;
 
@@ -242,6 +248,20 @@ public class cadastroUsuarioModalView extends javax.swing.JFrame {
         cbxStatus.setSelectedItem(
                 usuario.getAtivo() ? "ATIVO" : "INATIVO"
         );
+    }
+
+    private void configurarVisual() {
+
+        txtSenha.putClientProperty("JTextField.placeholderText", "Mínimo de 6 caracteres");
+        modal(this, "Cadastro de usuário", "Configure os dados e o acesso ao sistema.",
+                cartao("Dados de acesso", coluna(campo("Nome", txtNome), campo("E-mail", txtEmail), campo("Senha", txtSenha),
+                    grade(2, campo("Perfil", cbxTipoUsuario), campo("Status", cbxStatus)))), acoes(btnCancelar, btnSalvar), 650, 660);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

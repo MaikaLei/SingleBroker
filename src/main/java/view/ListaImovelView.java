@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import dao.ImovelDao;
 import util.Navegador;
 import enums.PerfilUsuario;
@@ -27,7 +29,9 @@ public class ListaImovelView extends javax.swing.JFrame {
      * Creates new form ListaImovelView
      */
     public ListaImovelView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
 
         lblUsuarios.setVisible(
                 SessaoUsuario.isAdministrador()
@@ -582,6 +586,21 @@ public class ListaImovelView extends javax.swing.JFrame {
                     "Erro ao abrir imóvel: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void configurarVisual() {
+
+        jScrollPane2.setPreferredSize(new java.awt.Dimension(800, 370));
+        pagina(this, panelMenu, "Imóveis", "Consulte seu portfólio e acompanhe cada negociação.", listagem(
+                cartao("Filtros de busca", coluna(grade(4, campo("Status", cbxStatus), campo("Transação", cbxTransacao), campo("Tipo", cbxTipo), campo("Cidade", cbxCidade)),
+                    grade(2, campo("Código do imóvel", txtCodigoBusca), acoes(btnLimpar, btnFiltrarImovel)))),
+                cartao("Imóveis cadastrados", resultado("Dê dois cliques para abrir os detalhes do imóvel.", jScrollPane2))), acoes(btnNovoImovel));
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

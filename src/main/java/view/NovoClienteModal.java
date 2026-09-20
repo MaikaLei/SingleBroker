@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import util.Navegador;
 import dao.ClienteDao;
 import model.ClientePfModel;
@@ -22,7 +24,9 @@ public class NovoClienteModal extends javax.swing.JFrame {
      * Creates new form NovoClienteModal
      */
     public NovoClienteModal() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
         util.MascaraData.aplicar(txtNascimento);
         jPanel1.setVisible(false);
         jPanel3.setVisible(false);
@@ -33,7 +37,9 @@ public class NovoClienteModal extends javax.swing.JFrame {
 
     public NovoClienteModal(ClienteModel cliente) {
 
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
         util.MascaraData.aplicar(txtNascimento);
 
         jPanel1.setVisible(false);
@@ -540,6 +546,30 @@ public class NovoClienteModal extends javax.swing.JFrame {
                 break;
         }
 
+    }
+
+    private void configurarVisual() {
+
+        jPanel1.setPreferredSize(null); jPanel2.setPreferredSize(null); jPanel3.setPreferredSize(null);
+        jPanel1.removeAll(); jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.add(cartao("Dados pessoais", coluna(campo("Nome completo", txtNome), grade(3,
+                campo("CPF", txtCpf), campo("RG", txtRg), campo("Nascimento", txtNascimento)))));
+        jPanel3.removeAll(); jPanel3.setLayout(new java.awt.BorderLayout());
+        jPanel3.add(cartao("Dados da empresa", coluna(campo("Razão social", TxtRazaoSocial), grade(2,
+                campo("CNPJ", txtCnpj), campo("Inscrição estadual", txtInscEstadual)), campo("Responsável", txtNomeResponsavel))));
+        jPanel2.removeAll(); jPanel2.setLayout(new java.awt.BorderLayout());
+        jPanel2.add(coluna(cartao("Endereço", coluna(grade(2, campo("CEP", txtCep), campo("Rua", txtRua)),
+                grade(2, campo("Número", txtNumero), campo("Complemento", txtComplemento)),
+                grade(3, campo("Bairro", txtBairro), campo("Cidade", txtCidade), campo("Estado", cbxEstado)))),
+                cartao("Contato", grade(2, campo("Telefone", txtTelefone), campo("E-mail", txtEmail)))));
+        modal(this, "Cadastro de cliente", "Dados pessoais ou da empresa, endereço e contato.",
+                coluna(campo("Tipo de cliente", cbxTipoCliente), jPanel1, jPanel3, jPanel2), acoes(btnCancelar, btnSalvar), 780, 840);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -4,6 +4,8 @@
  */
 package view;
 
+import static util.LayoutTela.*;
+
 import util.Navegador;
 
 /**
@@ -23,6 +25,7 @@ public class AgendaModal extends javax.swing.JFrame {
      * Creates new form AgendaModal
      */
     public AgendaModal() {
+        util.Tema.instalar();
         initComponents();
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         tblAgenda.setDefaultEditor(Object.class, null);
@@ -36,6 +39,7 @@ public class AgendaModal extends javax.swing.JFrame {
         tblAgenda.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent e) { if (e.getClickCount() == 2) editarSelecionada(); }
         });
+        configurarVisual();
     }
 
     /**
@@ -194,6 +198,21 @@ public class AgendaModal extends javax.swing.JFrame {
             javax.swing.JOptionPane.showMessageDialog(this, "Não foi possível excluir o agendamento.\n" + e.getMessage(),
                     "Erro ao excluir", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void configurarVisual() {
+
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(650, 300));
+        btnCancelar.setText("Fechar");
+        modal(this, "Agendamentos do dia", "Selecione uma tarefa para excluir; dê dois cliques para editar ou concluir.",
+            expandir(cartao("Sua programação", listagem(campo("Data", lblDataAgenda), jScrollPane1))),
+            acoes(btnCancelar, btnExcluirAgendamento, btnAgendarTarefa), 860, 580);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

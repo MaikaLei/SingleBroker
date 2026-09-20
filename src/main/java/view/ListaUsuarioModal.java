@@ -1,5 +1,7 @@
 package view;
 
+import static util.LayoutTela.*;
+
 import dao.UsuarioDao;
 import enums.PerfilUsuario;
 import java.time.LocalDateTime;
@@ -25,7 +27,9 @@ public class ListaUsuarioModal extends javax.swing.JFrame {
      * Creates new form NovoClienteModal
      */
     public ListaUsuarioModal() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
         tblListarUsuario.setDefaultEditor(Object.class, null);
         if (!SessaoUsuario.isAdministrador()) {
             JOptionPane.showMessageDialog(
@@ -312,6 +316,20 @@ public class ListaUsuarioModal extends javax.swing.JFrame {
                 usuario.getEmail()
             });
         }
+    }
+
+    private void configurarVisual() {
+
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(750, 340));
+        modal(this, "Usuários", "Gerencie as pessoas que têm acesso ao SingleBroker.", listagem(
+                cartao("Filtros", coluna(grade(2, campo("Perfil", cbxTipoUsuario), campo("Status", cbxStatus)), acoes(btnLimpar))),
+                cartao("Usuários cadastrados", resultado("Dê dois cliques em um usuário para editar.", jScrollPane1))), acoes(btnVoltar, btnNovoUsuario), 960, 760);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

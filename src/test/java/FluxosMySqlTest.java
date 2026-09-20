@@ -155,14 +155,66 @@ class FluxosMySqlTest {
                 telas.add(new view.CriativosView());telas.add(new view.MinhaPaginaView());telas.add(new view.RelatoriosView());
                 telas.add(new view.ImovelView(new ImovelDao().buscarPorId(imovel.getId())));
                 telas.add(new view.FotosModal(imovel.getId()));telas.add(new view.DocumentosModal(imovel.getId()));
+                telas.add(new view.LoginView());
+                telas.add(new view.NovoClienteModal(cliente));
+                telas.add(new view.NovoImovelView(new ImovelDao().buscarPorId(imovel.getId())));
+                telas.add(new view.SelecionarClienteView());
+                telas.add(new view.ListaUsuarioModal());
+                telas.add(new view.cadastroUsuarioModalView());
+                telas.add(new view.AgendaModal(LocalDate.now()));
+                telas.add(new view.AgendaHoraModal(LocalDate.now(), null));
                 Path imagens=Path.of(".work/previews");Files.createDirectories(imagens);
                 for(JFrame tela:telas) {
+                    util.Tema.aplicar(tela);
                     tela.validate();
-                    java.awt.image.BufferedImage imagem=new java.awt.image.BufferedImage(tela.getWidth(),tela.getHeight(),java.awt.image.BufferedImage.TYPE_INT_RGB);
-                    var g=imagem.createGraphics();tela.getContentPane().printAll(g);g.dispose();javax.imageio.ImageIO.write(imagem,"png",imagens.resolve(tela.getClass().getSimpleName()+".png").toFile());
+                    capturarTela(tela, imagens, tela.getClass().getSimpleName());
+                    for (JTabbedPane abas : componentes(tela.getContentPane(), JTabbedPane.class)) {
+                        for (int aba = 0; aba < abas.getTabCount(); aba++) {
+                            abas.setSelectedIndex(aba); tela.validate();
+                            capturarTela(tela, imagens, tela.getClass().getSimpleName()+"-aba"+aba);
+                            for (JScrollPane scroll : componentes(abas.getSelectedComponent(), JScrollPane.class)) {
+                                scroll.getVerticalScrollBar().setValue(scroll.getVerticalScrollBar().getMaximum());
+                            }
+                            capturarTela(tela, imagens, tela.getClass().getSimpleName()+"-aba"+aba+"-fim");
+                        }
+                    }
+                    if (tela instanceof view.NovoClienteModal || tela instanceof view.MinhaPaginaView || tela instanceof view.RelatoriosView || tela instanceof view.ImovelView) {
+                        java.util.List<JScrollPane> rolagens = componentes(tela.getContentPane(), JScrollPane.class);
+                        if (!rolagens.isEmpty()) rolagens.get(0).getVerticalScrollBar().setValue(rolagens.get(0).getVerticalScrollBar().getMaximum());
+                        capturarTela(tela, imagens, tela.getClass().getSimpleName()+"-fim");
+                    }
                 }
+                view.NovoClienteModal empresa = new view.NovoClienteModal(new ClienteDao().listarPj().get(0));
+                telas.add(empresa); util.Tema.aplicar(empresa); empresa.validate();
+                capturarTela(empresa, imagens, "NovoClienteModal-PJ");
             } catch(Exception e){throw new RuntimeException(e);} finally {telas.forEach(JFrame::dispose);}
         });
+    }
+
+    private <T> java.util.List<T> componentes(java.awt.Component raiz, Class<T> tipo) {
+        java.util.List<T> encontrados = new ArrayList<>();
+        if (tipo.isInstance(raiz)) encontrados.add(tipo.cast(raiz));
+        if (raiz instanceof java.awt.Container container)
+            for (java.awt.Component filho : container.getComponents()) encontrados.addAll(componentes(filho, tipo));
+        return encontrados;
+    }
+    private void capturarTela(JFrame tela, Path pasta, String nome) throws Exception {
+        tela.validate();
+        for (var atributo : tela.getClass().getDeclaredFields()) {
+            atributo.setAccessible(true);
+            Object valor = atributo.get(tela);
+            if (!(valor instanceof JTextField || valor instanceof JComboBox<?> || valor instanceof JButton)) continue;
+            java.awt.Component controle = (java.awt.Component)valor;
+            if (!SwingUtilities.isDescendingFrom(controle, tela.getContentPane())) continue;
+            boolean visivel = true;
+            for (java.awt.Component c = controle; c != null && c != tela; c = c.getParent()) visivel &= c.isVisible();
+            if (visivel) assertTrue(controle.getWidth() >= 24 && controle.getHeight() >= 24,
+                    nome+" / "+atributo.getName()+" está comprimido: "+controle.getSize());
+        }
+        var conteudo = tela.getContentPane();
+        java.awt.image.BufferedImage imagem = new java.awt.image.BufferedImage(conteudo.getWidth(), conteudo.getHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
+        var g = imagem.createGraphics(); conteudo.printAll(g); g.dispose();
+        javax.imageio.ImageIO.write(imagem, "png", pasta.resolve(nome+".png").toFile());
     }
 
     private JOptionPane mensagemEm(java.awt.Component componente) {

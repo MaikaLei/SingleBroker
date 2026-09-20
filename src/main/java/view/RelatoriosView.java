@@ -4,6 +4,8 @@
  */
 package view;
 
+import static util.LayoutTela.*;
+
 import java.awt.Color;
 import util.Navegador;
 import util.SessaoUsuario;
@@ -23,7 +25,9 @@ public class RelatoriosView extends javax.swing.JFrame {
      * Creates new form ListaImovelView
      */
     public RelatoriosView() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
         util.MascaraData.aplicar(txtDataInicial, txtDataFinal);
         configurarRelatorios();
         lblUsuarios.setVisible(
@@ -648,6 +652,23 @@ public class RelatoriosView extends javax.swing.JFrame {
                 util.Validador.data(txtDataInicial.getText(), "a data inicial"), util.Validador.data(txtDataFinal.getText(), "a data final"), usuario);
             util.ExportadorPdf.escolherESalvar(this, resultado.titulo(), resultado.texto());
         } catch (RuntimeException e) { javax.swing.JOptionPane.showMessageDialog(this, e.getMessage(), "Não foi possível gerar", javax.swing.JOptionPane.ERROR_MESSAGE); }
+    }
+
+    private void configurarVisual() {
+
+        lblTotalClientes.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 36));
+        lblTotalImoveis.setFont(lblTotalClientes.getFont()); lblAtivos.setFont(lblTotalClientes.getFont()); lblVendidos.setFont(lblTotalClientes.getFont());
+        pagina(this, panelMenu, "Relatórios", "Acompanhe os resultados e exporte suas informações em PDF.", coluna(
+                grade(4, cartao("Clientes", lblTotalClientes), cartao("Imóveis", lblTotalImoveis), cartao("Ativos", lblAtivos), cartao("Vendidos", lblVendidos)),
+                cartao("Gerar relatório", coluna(grade(2, campo("Tipo de relatório", cbxStatus), campo("Usuário", cbxUsuario)),
+                    grade(2, campo("Data inicial", txtDataInicial), campo("Data final", txtDataFinal)), acoes(btnLimpar, btnGerarArquivo))),
+                cartao("Acesso rápido", coluna(lblUltimosAdd, lblUltimosVendidos, lblAtivosRapido, lblProprietariosRapidos, lblClientesRapidos))), null);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

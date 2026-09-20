@@ -4,6 +4,8 @@
  */
 package view;
 
+import static util.LayoutTela.*;
+
 import util.Navegador;
 
 /**
@@ -21,7 +23,9 @@ public class FotosModal extends javax.swing.JFrame {
      * Creates new form FotosModal
      */
     public FotosModal() {
+        util.Tema.instalar();
         initComponents();
+        configurarVisual();
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     }
 
@@ -193,8 +197,21 @@ public class FotosModal extends javax.swing.JFrame {
         pnlSemFotos.setLayout(new java.awt.BorderLayout());
         pnlSemFotos.add(anexos, java.awt.BorderLayout.CENTER);
         pnlSemFotos.revalidate();
-        pack();
+        configurarVisual();
         jLabel2.setText("Use Adicionar para selecionar arquivos (até 5 MB cada).");
+    }
+
+    private void configurarVisual() {
+        javax.swing.JComponent conteudo = anexos == null ? pnlSemFotos : anexos;
+        conteudo.setPreferredSize(new java.awt.Dimension(680, 330));
+        modal(this, "Fotos do imóvel", "Adicione arquivos de até 5 MB cada. Confirme as alterações em Salvar.",
+            expandir(cartao("Arquivos do imóvel", conteudo)), acoes(btnCancelar, btnSalvarImovel), 820, 610);
+    }
+
+    @Override
+    public void setVisible(boolean visivel) {
+        if (visivel) util.Tema.aplicar(this);
+        super.setVisible(visivel);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

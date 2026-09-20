@@ -53,6 +53,16 @@ mvn -Dsinglebroker.buildDirectory=.work/build -Dsinglebroker.integration=true te
 
 Os arquivos `.form` e os blocos de layout gerados pelo NetBeans foram preservados. A conexão dos eventos e os ajustes necessários são feitos fora desses blocos.
 
+## Interface desktop
+
+As 17 telas usam FlatLaf 3.7, com uma identidade visual comum definida em `util.Tema`: azul da marca, fundo claro, fontes Segoe UI, indicadores de foco e tabelas com linhas mais altas. O menu mantém a mesma ordem e destaca a seção aberta; também aceita Tab e Enter.
+
+`util.LayoutTela` organiza cabeçalhos, seções, campos e rodapés com os gerenciadores de layout do Swing. Os métodos `configurarVisual()` reutilizam os controles e eventos existentes, fora dos blocos gerados. O cadastro de imóvel está dividido em Dados e endereço, Características, e Valores e anexos. Formulários longos têm rolagem; as ações de salvar e cancelar permanecem no rodapé.
+
+Ao abrir o projeto pelo NetBeans, o Maven baixa o FlatLaf automaticamente. Execute `main.Main` (F6). Para alterar o visual em execução, ajuste `Tema`, `LayoutTela` ou `configurarVisual()`; os arquivos `.form` continuam disponíveis como a definição original dos controles.
+
+O teste de integração renderiza todas as telas, as abas do imóvel e o cadastro PF/PJ em `.work/previews`, e verifica se os controles visíveis mantêm tamanho utilizável. Os dados usados nessas imagens são do banco de teste isolado.
+
 ## Backup desta etapa
 
 Antes das alterações, foram criados na raiz do projeto um ZIP completo, incluindo `.git`, e um dump SQL do banco. São arquivos locais ignorados pelo Git. Os nomes e a verificação constam em `DESENVOLVIMENTO.md`.
